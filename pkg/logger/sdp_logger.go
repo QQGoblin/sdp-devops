@@ -10,7 +10,7 @@ var log *logrus.Logger
 func init() {
 	log = logrus.New()
 	log.Out = os.Stdout
-	log.Formatter = &logrus.JSONFormatter{}
+	//log.Formatter = &logrus.JSONFormatter{}
 	//log.SetLevel(logrus.InfoLevel)
 	log.WithFields(logrus.Fields{
 		"sdp-devops": "Kubernetes",
