@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sdp-cleaner
+  namespace: sdp-exporter
+spec:
+  selector:
+    matchLabels:
+      name: sdp-cleaner
+  template:
+    metadata:
+      labels:
+        name: sdp-cleaner
+    spec:
+      containers:
+        - name: sdp-cleaner
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.0
+          command: ["/bin/sdp-cleaner"]
+          args:  [ "--server","true" ]
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+      priority: 0
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+      volumes:
+        - name: data
+          hostPath:
+            path: /data

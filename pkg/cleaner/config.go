@@ -11,7 +11,10 @@ var (
 	dockerBase       string
 	logEditTimeLimit int   // 上次编辑时间，单位天
 	logSizeLimit     int64 // 文件大小限制，单位byte
-	logFileExt       = mapset.NewSet(
+	isServer         bool
+	cronStr          string
+
+	logFileExt = mapset.NewSet(
 		".log",
 		".out",
 	)
@@ -34,4 +37,6 @@ func AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&dockerBase, "container-base", "/data/var/lib/docker", "Docker服务的根目录。")
 	flags.IntVar(&logEditTimeLimit, "last-edit-time", 30, "最晚文件编辑时间。")
 	flags.Int64Var(&logSizeLimit, "max-size", 1*unit.GB, "最晚文件编辑时间。")
+	flags.BoolVar(&isServer, "server", false, "启动定时清理服务。")
+	flags.StringVar(&cronStr, "cron", "0 * * * *", "定时清理crontab配置。")
 }

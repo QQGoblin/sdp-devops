@@ -151,11 +151,10 @@ func cleanContainerStdLog() {
 		- 大于 指定大小 的文件（echo方式清理）
 */
 func Main() {
-	crontabStr := os.Getenv("SDP_CLEANER_CRON")
-	if strings.EqualFold(crontabStr, "") {
+	if !isServer {
 		cleanDir(tomcatLogDir)
 		cleanContainerStdLog()
 	} else {
-		cleanCrontab(crontabStr)
+		cleanCrontab(cronStr)
 	}
 }
