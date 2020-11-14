@@ -1,10 +1,9 @@
 package collector
 
 import (
-	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"os"
-	"sdp-devops/pkg/util"
+	"sdp-devops/pkg/logger"
 	"sync"
 	"time"
 )
@@ -60,10 +59,10 @@ func execute(name string, c Collector, ch chan<- prometheus.Metric) {
 	var success float64
 	nodename, _ := os.Hostname()
 	if err != nil {
-		fmt.Printf("%s,数据采集异常\n", name)
+		logger.Errorf("%s,数据采集异常\n", name)
 		success = 0
 	} else {
-		util.Info.Printf("%s,数据采集正常，持续时间：%f\n", name, duration.Seconds())
+		logger.Infof("%s,数据采集正常，持续时间：%f\n", name, duration.Seconds())
 		success = 1
 	}
 	ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.GaugeValue, duration.Seconds(), name, nodename)

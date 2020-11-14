@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 	"sdp-devops/pkg/exporter/config"
-	"sdp-devops/pkg/util"
+	"sdp-devops/pkg/logger"
 	dockertools "sdp-devops/pkg/util/docker"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
@@ -62,13 +62,13 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 	nodename, _ := os.Hostname()
 	pods := podDict[nodename]
 	if pods == nil || len(pods) == 0 {
-		util.Warning.Printf("%s 不是Kubernetes集群的节点或者该节点没有Pod运行\n", nodename)
+		logger.Warnf("%s 不是Kubernetes集群的节点或者该节点没有Pod运行\n", nodename)
 		return nil
 	}
 
 	for _, pod := range pods {
 		if pod.Status.Phase != v1.PodRunning {
-			util.Warning.Printf("%s 没有正常运行，状态：%s\n", pod.Name, pod.Status.Phase)
+			logger.Warnf("%s 没有正常运行，状态：%s\n", pod.Name, pod.Status.Phase)
 			continue
 		}
 		var containerSize int64

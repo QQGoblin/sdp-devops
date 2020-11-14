@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
-	"sdp-devops/pkg/util"
+	"sdp-devops/pkg/logger"
 	unit "sdp-devops/pkg/util/metrics"
 	"strings"
 	"time"
@@ -18,7 +18,7 @@ func echo(filepath string) {
 	cmd := exec.Command("/bin/sh", "-c", "echo "+CLEAN_MSG+" > "+filepath)
 	err := cmd.Run()
 	if err != nil {
-		util.Error.Printf("清空文件失败：%s (%s)", filepath, err.Error())
+		logger.Errorf("清空文件失败：%s (%s)", filepath, err.Error())
 	}
 }
 
@@ -30,12 +30,12 @@ func cleanDir(dirpath string) bool {
 	lastEditTime := time.Now().AddDate(0, 0, -logEditTimeLimit).Local()
 
 	if err := os.Chdir(dirpath); err != nil {
-		util.Error.Printf("目录不存在或者目录不可用：%s (%s)", dirpath, err.Error())
+		logger.Errorf("目录不存在或者目录不可用：%s (%s)", dirpath, err.Error())
 		return false
 	}
 	files, err := ioutil.ReadDir(".")
 	if err != nil {
-		util.Error.Printf("查询目录信息失败：%s (%s)", dirpath, err.Error())
+		logger.Errorf("查询目录信息失败：%s (%s)", dirpath, err.Error())
 		return false
 	}
 	if len(files) == 0 {
@@ -46,14 +46,14 @@ func cleanDir(dirpath string) bool {
 		if file.Mode().IsRegular() {
 			fileExt := path.Ext(file.Name())
 			if file.ModTime().Before(lastEditTime) && (isTimeExt(fileExt) || deleteFileExt.Contains(fileExt)) {
-				util.Info.Printf("超出编辑时间限制，删除文件：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
+				logger.Infof("超出编辑时间限制，删除文件：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
 				if err = os.Remove(path.Join(dirpath, file.Name())); err != nil {
-					util.Error.Printf("删除文件失败：%s (%s)", file.Name(), err.Error())
+					logger.Errorf("删除文件失败：%s (%s)", file.Name(), err.Error())
 				}
 				continue
 			}
 			if file.Size() > logSizeLimit && logFileExt.Contains(fileExt) {
-				util.Info.Printf("文件超出大小限制，清除数据：%s (%s) ", path.Join(dirpath, file.Name()), unit.FormatByte(file.Size()))
+				logger.Infof("文件超出大小限制，清除数据：%s (%s) ", path.Join(dirpath, file.Name()), unit.FormatByte(file.Size()))
 				echo(path.Join(dirpath, file.Name()))
 				continue
 			}
@@ -62,9 +62,9 @@ func cleanDir(dirpath string) bool {
 			isEmpty := cleanDir(path.Join(dirpath, file.Name()))
 
 			if isEmpty && file.ModTime().Before(lastEditTime) {
-				util.Info.Printf("超出编辑时间限制，删除空白目录：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
+				logger.Infof("超出编辑时间限制，删除空白目录：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
 				if err = os.Remove(path.Join(dirpath, file.Name())); err != nil {
-					util.Error.Printf("删除目录失败：%s (%s)", file.Name(), err.Error())
+					logger.Errorf("删除目录失败：%s (%s)", file.Name(), err.Error())
 				}
 			}
 		}
@@ -97,15 +97,15 @@ func cleanCrontab(crontabStr string) {
 
 	crontab := cron.New()
 	task := func() {
-		util.Info.Println("#######################################################################################")
-		util.Info.Printf("Start Clean Job:%s", time.Now())
-		util.Info.Println("#######################################################################################")
+		logger.Println("#######################################################################################")
+		logger.Printf("Start Clean Job:%s \n", time.Now())
+		logger.Println("#######################################################################################")
 		cleanDir(tomcatLogDir)
 		cleanContainerStdLog()
 
 	}
 	if _, err := crontab.AddFunc(crontabStr, task); err != nil {
-		util.Error.Println(err.Error())
+		logger.Errorf(err.Error())
 		return
 	}
 	crontab.Start()
@@ -116,7 +116,7 @@ func cleanContainerStdLog() {
 	containerBase := path.Join(dockerBase, "containers")
 
 	if err := os.Chdir(containerBase); err != nil {
-		util.Error.Printf("目录不存在或者目录不可用：%s (%s)", containerBase, err.Error())
+		logger.Errorf("目录不存在或者目录不可用：%s (%s)", containerBase, err.Error())
 		return
 	}
 	containers, _ := ioutil.ReadDir(".")
@@ -125,13 +125,13 @@ func cleanContainerStdLog() {
 		if c.IsDir() {
 			files, err := ioutil.ReadDir(c.Name())
 			if err != nil {
-				util.Error.Printf("读取容器(%s)日志目录失败：%s", c.Name(), err.Error())
+				logger.Errorf("读取容器(%s)日志目录失败：%s", c.Name(), err.Error())
 				continue
 			}
 			for _, file := range files {
 				if strings.EqualFold(file.Name(), c.Name()+"-json.log") && file.Size() > logSizeLimit {
 					stdLogPath := path.Join(containerBase, c.Name(), file.Name())
-					util.Info.Printf("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, unit.FormatByte(file.Size()))
+					logger.Errorf("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, unit.FormatByte(file.Size()))
 					echo(stdLogPath)
 					break
 				}
