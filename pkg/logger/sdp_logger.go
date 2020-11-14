@@ -23,7 +23,7 @@ func Debugf(format string, args ...interface{}) {
 }
 
 func Infof(format string, args ...interface{}) {
-	log.Info(format, args)
+	log.Infof(format, args)
 }
 
 func Warnf(format string, args ...interface{}) {
