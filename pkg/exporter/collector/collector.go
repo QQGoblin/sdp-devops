@@ -90,6 +90,9 @@ func registerCollector(collector string, factory func() (Collector, error)) {
 		including.Add(s)
 	}
 
+	logger.Infof("采集器白名单：%s", including.String())
+	logger.Infof("采集器黑名单：%s", including.String())
+
 	if including.Contains(collector) {
 		logger.Infof("启用采集器：%s", collector)
 		factories[collector] = factory
