@@ -88,10 +88,14 @@ func disabled(collector string) bool {
 	isDisabled := excluding.Contains(collector)
 
 	if !isDisabled && strings.EqualFold(config.IncludingCol, "") {
-		return true
-	} else {
+		// 没进黑名单，且没有配置白名单
+		return false
+	}
+	if isDisabled {
+		// 进黑名单，如果配置了白名单，那么以白名单为准
 		return !including.Contains(collector)
 	}
+	// 没进黑名单，无论白名单何种状态，都通过
 	return isDisabled
 }
 
@@ -105,7 +109,7 @@ func NewNodeCollector() (*SDPCollector, error) {
 		including.Add(s)
 	}
 	logger.Infof("采集器白名单：%s", including.String())
-	logger.Infof("采集器黑名单：%s", including.String())
+	logger.Infof("采集器黑名单：%s", excluding.String())
 
 	collectors := make(map[string]Collector)
 	for key, f := range factories {
