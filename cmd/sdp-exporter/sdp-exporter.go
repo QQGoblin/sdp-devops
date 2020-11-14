@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"sdp-devops/pkg/exporter"
+	"sdp-devops/pkg/exporter/config"
 )
 
 func main() {
@@ -23,6 +24,6 @@ func NewExporterCommand() *cobra.Command {
 		},
 	}
 	flags := rootCmd.PersistentFlags()
-	exporter.AddFlags(flags)
+	config.AddFlags(flags)
 	return rootCmd
 }

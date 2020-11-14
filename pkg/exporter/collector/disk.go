@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/toolkits/nux"
 	"os"
-	"sdp-devops/pkg/exporter"
+	"sdp-devops/pkg/exporter/config"
 	"strings"
 )
 
@@ -51,7 +51,7 @@ func NewDiskCollector() (Collector, error) {
 func (c *diskCollector) Update(ch chan<- prometheus.Metric) error {
 
 	nodename, _ := os.Hostname()
-	monitorStr := exporter.MonitorDirectories
+	monitorStr := config.MonitorDirectories
 	if strings.EqualFold(monitorStr, "") {
 		fmt.Printf("请指定磁盘监控目录")
 		return nil

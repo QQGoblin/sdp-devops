@@ -5,7 +5,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"os"
 	"path"
-	"sdp-devops/pkg/exporter"
+	"sdp-devops/pkg/exporter/config"
 	"sdp-devops/pkg/util"
 	dockertools "sdp-devops/pkg/util/docker"
 	k8stools "sdp-devops/pkg/util/kubernetes"
@@ -53,7 +53,7 @@ func NewContainerCollector() (Collector, error) {
 
 // 实现采集接口
 func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
-	k8scli := k8stools.KubeClientByConfig(exporter.KubeConfigStr)
+	k8scli := k8stools.KubeClientByConfig(config.KubeConfigStr)
 	dockercli := dockertools.DockerClient("")
 	podDict, err := k8stools.GetPodDict(k8scli, "")
 	if err != nil {
@@ -78,7 +78,7 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 			dockerLogSize += dockertools.ContainerLogSize(containerId, dockercli)
 			containerSize += dockertools.ContainerSize(containerId, dockercli)
 		}
-		tomcatLogDirPath := path.Join(exporter.TomcatLogDir, pod.Name)
+		tomcatLogDirPath := path.Join(config.TomcatLogDir, pod.Name)
 
 		_, isExist := os.Stat(tomcatLogDirPath)
 		var tomcatLogSize int64
