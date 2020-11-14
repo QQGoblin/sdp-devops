@@ -80,46 +80,47 @@ type Collector interface {
 	Update(ch chan<- prometheus.Metric) error
 }
 
-func init() {
+func registerCollector(collector string, factory func() (Collector, error)) {
+	factories[collector] = factory
+}
+
+func disabled(collector string) bool {
+	isDisabled := excluding.Contains(collector)
+
+	if !isDisabled && strings.EqualFold(config.IncludingCol, "") {
+		return true
+	} else {
+		return !including.Contains(collector)
+	}
+	return isDisabled
+}
+
+// 创建SDPCollector
+func NewNodeCollector() (*SDPCollector, error) {
+
 	for _, s := range strings.Split(config.ExcludingCol, ",") {
 		excluding.Add(s)
 	}
-
 	for _, s := range strings.Split(config.IncludingCol, ",") {
 		including.Add(s)
 	}
 	logger.Infof("采集器白名单：%s", including.String())
 	logger.Infof("采集器黑名单：%s", including.String())
-}
 
-func registerCollector(collector string, factory func() (Collector, error)) {
-
-	if including.Contains(collector) {
-		logger.Infof("启用采集器：%s", collector)
-		factories[collector] = factory
-		return
-	}
-
-	if excluding.Contains(collector) {
-		logger.Infof("禁用采集器：%s", collector)
-	} else {
-		if strings.EqualFold(config.IncludingCol, "") {
-			logger.Infof("启用采集器：%s", collector)
-			factories[collector] = factory
-		}
-	}
-
-}
-
-// 创建SDPCollector
-func NewNodeCollector() (*SDPCollector, error) {
 	collectors := make(map[string]Collector)
 	for key, f := range factories {
-		collector, err := f()
-		if err != nil {
-			return nil, err
+		if disabled(key) {
+			logger.Infof("禁用采集器：%s", key)
+			continue
+		} else {
+			logger.Infof("启用采集器：%s", key)
+			collector, err := f()
+			if err != nil {
+				return nil, err
+			}
+			collectors[key] = collector
 		}
-		collectors[key] = collector
+
 	}
 	return &SDPCollector{Collectors: collectors}, nil
 }
