@@ -36,7 +36,8 @@ func ContainerSize(containerID string, cli *client.Client) int64 {
 		panic(err.Error())
 	}
 	upperDir := containerInfo.GraphDriver.Data["UpperDir"]
-	upperDirSize, _ := sys.CalculateDirSize(upperDir)
+	// TODO: 这里改成系统调用会不会更快？
+	upperDirSize, _ := sys.CalDirSize(upperDir)
 	return upperDirSize
 }
 
@@ -47,6 +48,6 @@ func ContainerLogSize(containerID string, cli *client.Client) int64 {
 		panic(err.Error())
 	}
 	containerDataPath := path.Join(dockerInfo.DockerRootDir, "containers", containerID)
-	logSize, _ := sys.CalculateDirSize(containerDataPath)
+	logSize, _ := sys.CalDirSize(containerDataPath)
 	return logSize
 }

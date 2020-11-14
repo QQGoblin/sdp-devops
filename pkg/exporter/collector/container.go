@@ -83,7 +83,7 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 		_, isExist := os.Stat(tomcatLogDirPath)
 		var tomcatLogSize int64
 		if isExist == nil {
-			tomcatLogSize, _ = systools.CalculateDirSize(tomcatLogDirPath)
+			tomcatLogSize, _ = systools.CalDirSize(tomcatLogDirPath)
 		}
 		ch <- prometheus.MustNewConstMetric(c.containerSize, prometheus.GaugeValue, float64(containerSize), pod.Name, pod.Namespace, nodename)
 		ch <- prometheus.MustNewConstMetric(c.logSize, prometheus.GaugeValue, float64(dockerLogSize), pod.Name, pod.Namespace, nodename)

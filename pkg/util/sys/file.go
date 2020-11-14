@@ -7,7 +7,7 @@ import (
 )
 
 // 计算目录的大小
-func CalculateDirSize(dirpath string) (dirsize int64, err error) {
+func CalDirSize(dirpath string) (dirsize int64, err error) {
 	err = os.Chdir(dirpath)
 	if err != nil {
 		return
@@ -20,7 +20,7 @@ func CalculateDirSize(dirpath string) (dirsize int64, err error) {
 	for _, file := range files {
 		dirsize += file.Size()
 		if file.Mode().IsDir() {
-			subDirSize, err2 := CalculateDirSize(path.Join(dirpath, file.Name()))
+			subDirSize, err2 := CalDirSize(path.Join(dirpath, file.Name()))
 			if err2 == nil {
 				dirsize += subDirSize
 			}
