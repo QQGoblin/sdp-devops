@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: sdp-cleaner
-  namespace: sdp-exporter
+  namespace: sdp-devops
 spec:
   selector:
     matchLabels:
