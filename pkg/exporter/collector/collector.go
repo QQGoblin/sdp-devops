@@ -64,10 +64,10 @@ func execute(name string, c Collector, ch chan<- prometheus.Metric) {
 	var success float64
 	nodename, _ := os.Hostname()
 	if err != nil {
-		logger.Errorf("%s,数据采集异常\n", name)
+		logger.Errorf("%s,数据采集异常", name)
 		success = 0
 	} else {
-		logger.Infof("%s,数据采集正常，持续时间：%f\n", name, duration.Seconds())
+		logger.Infof("%s,数据采集正常，持续时间：%f", name, duration.Seconds())
 		success = 1
 	}
 	ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.GaugeValue, duration.Seconds(), name, nodename)
@@ -91,12 +91,8 @@ func disabled(collector string) bool {
 		// 没进黑名单，且没有配置白名单
 		return false
 	}
-	if isDisabled {
-		// 进黑名单，如果配置了白名单，那么以白名单为准
-		return !including.Contains(collector)
-	}
-	// 没进黑名单，无论白名单何种状态，都通过
-	return isDisabled
+	return !including.Contains(collector)
+
 }
 
 // 创建SDPCollector
