@@ -26,6 +26,8 @@ var (
 	)
 
 	factories = make(map[string]func() (Collector, error))
+	excluding = mapset.NewSet()
+	including = mapset.NewSet()
 )
 
 const namespace = "sdp"
@@ -78,10 +80,7 @@ type Collector interface {
 	Update(ch chan<- prometheus.Metric) error
 }
 
-func registerCollector(collector string, factory func() (Collector, error)) {
-
-	excluding := mapset.NewSet()
-	including := mapset.NewSet()
+func init() {
 	for _, s := range strings.Split(config.ExcludingCol, ",") {
 		excluding.Add(s)
 	}
@@ -89,9 +88,11 @@ func registerCollector(collector string, factory func() (Collector, error)) {
 	for _, s := range strings.Split(config.IncludingCol, ",") {
 		including.Add(s)
 	}
-
 	logger.Infof("采集器白名单：%s", including.String())
 	logger.Infof("采集器黑名单：%s", including.String())
+}
+
+func registerCollector(collector string, factory func() (Collector, error)) {
 
 	if including.Contains(collector) {
 		logger.Infof("启用采集器：%s", collector)
