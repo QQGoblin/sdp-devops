@@ -1,9 +1,12 @@
 package collector
 
 import (
+	mapset "github.com/deckarep/golang-set"
 	"github.com/prometheus/client_golang/prometheus"
 	"os"
+	"sdp-devops/pkg/exporter/config"
 	"sdp-devops/pkg/logger"
+	"strings"
 	"sync"
 	"time"
 )
@@ -76,7 +79,32 @@ type Collector interface {
 }
 
 func registerCollector(collector string, factory func() (Collector, error)) {
-	factories[collector] = factory
+
+	excluding := mapset.NewSet()
+	including := mapset.NewSet()
+	for _, s := range strings.Split(config.ExcludingCol, ",") {
+		excluding.Add(s)
+	}
+
+	for _, s := range strings.Split(config.IncludingCol, ",") {
+		including.Add(s)
+	}
+
+	if including.Contains(collector) {
+		logger.Infof("启用采集器：%s", collector)
+		factories[collector] = factory
+		return
+	}
+
+	if excluding.Contains(collector) {
+		logger.Infof("禁用采集器：%s", collector)
+	} else {
+		if strings.EqualFold(config.IncludingCol, "") {
+			logger.Infof("启用采集器：%s", collector)
+			factories[collector] = factory
+		}
+	}
+
 }
 
 // 创建SDPCollector

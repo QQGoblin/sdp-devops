@@ -15,8 +15,9 @@ spec:
     spec:
       containers:
         - name: sdp-exporter
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.0
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.1
           command: ["/bin/sdp-exporter"]
+          args:  [ "--excluding","container"]
           imagePullPolicy: Always
           env:
             - name: NUX_ROOTFS
@@ -36,7 +37,32 @@ spec:
               readOnly: true
           resources:
             limits:
-              cpu: "4"
+              cpu: "1"
+              memory: 1Gi
+        - name: sdp-exporter-slow
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.1
+          command: ["/bin/sdp-exporter"]
+          args:  [ "--including","container","--port","17001" ]
+          imagePullPolicy: Always
+          env:
+            - name: NUX_ROOTFS
+              value: /host
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              readOnly: true
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+              readOnly: true
+            - mountPath: /host/proc
+              name: proc
+              readOnly: true
+          resources:
+            limits:
+              cpu: "1"
               memory: 1Gi
       hostNetwork: true
       serviceAccount: sdp-devops

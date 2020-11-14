@@ -22,7 +22,7 @@ func Main() {
 			ErrorHandling: promhttp.ContinueOnError,
 		},
 	)
-	http.Handle("/metrics", handler)
+	http.Handle(config.MetricsURL, handler)
 	if err := http.ListenAndServe("0.0.0.0:"+config.Port, nil); err != nil {
 		logger.Errorf("创建SDPCollector实例失败: %s", err)
 	}
