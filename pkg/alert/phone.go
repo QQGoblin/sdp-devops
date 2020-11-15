@@ -85,7 +85,7 @@ func PostPhoneAlert(content, reciever string) {
 	json.Unmarshal(rbody, &respone)
 
 	if strings.EqualFold(respone.Code, "ok") {
-		logrus.Infof("发送电话告警信息:（%s），%s，。", content, reciever, string(rbody))
+		logrus.Infof("发送电话告警信息:（%s），%s，%s。", content, reciever, string(rbody))
 	} else {
 		logrus.Errorf("发送电话告警信息:（%s）-- %s，服务端异常（%s）。", content, reciever, string(rbody))
 	}

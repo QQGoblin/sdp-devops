@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdp-alert
+  namespace: sdp-devops
+spec:
+  selector:
+    matchLabels:
+      name: sdp-alert
+  template:
+    metadata:
+      labels:
+        name: sdp-alert
+    spec:
+      containers:
+        - name: sdp-alert
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
+          command: ["/bin/sdp-alert"]
+          args:  [ "--reciever", "15860837730" ]
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdp-alert
+  namespace: sdp-devops
+  labels:
+    name: sdp-alert
+spec:
+  ports:
+    - name: http
+      port: 8080
+  selector:
+    name: sdp-alert
