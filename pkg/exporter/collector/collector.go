@@ -6,7 +6,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"sdp-devops/pkg/exporter/config"
-	"sdp-devops/pkg/logger"
 	"strings"
 	"sync"
 	"time"

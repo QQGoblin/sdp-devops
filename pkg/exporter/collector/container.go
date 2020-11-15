@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"sdp-devops/pkg/exporter/config"
-	"sdp-devops/pkg/logger"
 	dockertools "sdp-devops/pkg/util/docker"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
