@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 	"os"
 	"path"
@@ -62,13 +63,13 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 	nodename, _ := os.Hostname()
 	pods := podDict[nodename]
 	if pods == nil || len(pods) == 0 {
-		logger.Warnf("%s 不是Kubernetes集群的节点或者该节点没有Pod运行\n", nodename)
+		logrus.Warnf("%s 不是Kubernetes集群的节点或者该节点没有Pod运行\n", nodename)
 		return nil
 	}
 
 	for _, pod := range pods {
 		if pod.Status.Phase != v1.PodRunning {
-			logger.Warnf("%s 没有正常运行，状态：%s\n", pod.Name, pod.Status.Phase)
+			logrus.Warnf("%s 没有正常运行，状态：%s\n", pod.Name, pod.Status.Phase)
 			continue
 		}
 		var containerSize int64

@@ -2,6 +2,7 @@ package collector
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	"github.com/toolkits/nux"
 	"os"
 	"sdp-devops/pkg/exporter/config"
@@ -53,7 +54,7 @@ func (c *diskCollector) Update(ch chan<- prometheus.Metric) error {
 	nodename, _ := os.Hostname()
 	monitorStr := config.MonitorDirectories
 	if strings.EqualFold(monitorStr, "") {
-		logger.Errorf("请指定磁盘监控目录")
+		logrus.Errorf("请指定磁盘监控目录")
 		return nil
 	}
 	directories := strings.Split(monitorStr, ",")
@@ -62,10 +63,10 @@ func (c *diskCollector) Update(ch chan<- prometheus.Metric) error {
 		isMount := -1
 		_, isNotExist := os.Stat(directory)
 		if isNotExist != nil {
-			logger.Errorf("%s 目录不存在(%s)。\n", directory, isNotExist.Error())
+			logrus.Errorf("%s 目录不存在(%s)。\n", directory, isNotExist.Error())
 		} else {
 			if L, err := nux.ListMountPoint(); err != nil {
-				logger.Errorf("获取系统挂载信息失败(%s)。", err.Error())
+				logrus.Errorf("获取系统挂载信息失败(%s)。", err.Error())
 			} else {
 				for _, arr := range L {
 					if strings.EqualFold(directory, arr[1]) {

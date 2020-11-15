@@ -3,27 +3,27 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"os"
-	"sdp-devops/pkg/cleaner"
+	"sdp-devops/pkg/alert"
 	sdpLogger "sdp-devops/pkg/logger"
 )
 
 func main() {
 	sdpLogger.InitLogger()
-	command := NewCleanerCommand()
+	command := NewAlertServerCommand()
 	if err := command.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
-func NewCleanerCommand() *cobra.Command {
+func NewAlertServerCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "sdp-cleaner",
-		Short: "SDP Kubernetes 磁盘清理工具。",
+		Use:   "sdp-alert",
+		Short: "SDP Kubernetes 告警网关。",
 		Run: func(cmd *cobra.Command, args []string) {
-			cleaner.Main()
+			alert.Main()
 		},
 	}
 	flags := rootCmd.PersistentFlags()
-	cleaner.AddFlags(flags)
+	alert.AddFlags(flags)
 	return rootCmd
 }

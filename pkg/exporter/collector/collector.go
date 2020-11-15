@@ -3,6 +3,7 @@ package collector
 import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	"os"
 	"sdp-devops/pkg/exporter/config"
 	"sdp-devops/pkg/logger"
@@ -64,10 +65,10 @@ func execute(name string, c Collector, ch chan<- prometheus.Metric) {
 	var success float64
 	nodename, _ := os.Hostname()
 	if err != nil {
-		logger.Errorf("%s,数据采集异常", name)
+		logrus.Errorf("%s,数据采集异常", name)
 		success = 0
 	} else {
-		logger.Infof("%s,数据采集正常，持续时间：%f", name, duration.Seconds())
+		logrus.Infof("%s,数据采集正常，持续时间：%f", name, duration.Seconds())
 		success = 1
 	}
 	ch <- prometheus.MustNewConstMetric(scrapeDurationDesc, prometheus.GaugeValue, duration.Seconds(), name, nodename)
@@ -104,16 +105,16 @@ func NewNodeCollector() (*SDPCollector, error) {
 	for _, s := range strings.Split(config.IncludingCol, ",") {
 		including.Add(s)
 	}
-	logger.Infof("采集器白名单：%s", including.String())
-	logger.Infof("采集器黑名单：%s", excluding.String())
+	logrus.Infof("采集器白名单：%s", including.String())
+	logrus.Infof("采集器黑名单：%s", excluding.String())
 
 	collectors := make(map[string]Collector)
 	for key, f := range factories {
 		if disabled(key) {
-			logger.Infof("禁用采集器：%s", key)
+			logrus.Infof("禁用采集器：%s", key)
 			continue
 		} else {
-			logger.Infof("启用采集器：%s", key)
+			logrus.Infof("启用采集器：%s", key)
 			collector, err := f()
 			if err != nil {
 				return nil, err
