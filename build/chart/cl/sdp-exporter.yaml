@@ -40,7 +40,7 @@ spec:
               cpu: "1"
               memory: 1Gi
         - name: sdp-exporter-slow
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.1
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
           command: ["/bin/sdp-exporter"]
           args:  [ "--including","container","--port","17001" ]
           imagePullPolicy: Always
