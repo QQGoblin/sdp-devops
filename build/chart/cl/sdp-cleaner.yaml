@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sdp-cleaner
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.1
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
           command: ["/bin/sdp-cleaner"]
           args:  [ "--server","true" ]
           imagePullPolicy: Always
