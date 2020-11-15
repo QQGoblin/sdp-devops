@@ -21,6 +21,33 @@ type PhoneAlertResponse struct {
 	Code string `json:"code"`
 }
 
+type AnnotationsMsg struct {
+	Description string `json:"description"`
+	Summary     string `json:"summary"`
+}
+
+type AlerStatus struct {
+	Status       string            `json:"status"`
+	Labels       map[string]string `json:"labels"`
+	Annotations  AnnotationsMsg    `json:"annotations"`
+	StartsAt     string            `json:"startsAt"`
+	EndsAt       string            `json:"endsAt"`
+	GeneratorURL string            `json:"generatorURL"`
+	Fingerprint  string            `json:"fingerprint"`
+}
+
+type AlertNotifyMsg struct {
+	Receiver          string            `json:"receiver"`
+	Status            string            `json:"status"`
+	Alerts            []AlerStatus      `json:"alerts"`
+	GroupLabels       map[string]string `json:"groupLabels"`
+	CommonLabels      map[string]string `json:"commonLabels"`
+	CommonAnnotations map[string]string `json:"commonAnnotations"`
+	ExternalURL       string            `json:"externalURL"`
+	Version           string            `json:"version"`
+	GroupKey          string            `json:"groupKey"`
+}
+
 func PostPhoneAlert(content, reciever string) {
 
 	url := "http://" + falconServer + alarmURL
@@ -62,12 +89,26 @@ func PostPhoneAlert(content, reciever string) {
 }
 
 func PhoneAlertHandler(w http.ResponseWriter, r *http.Request) {
-	logrus.Println("method = ", r.Method) //请求方法
-	logrus.Println("URL = ", r.URL)       // 浏览器发送请求文件路径
-	logrus.Println("header = ", r.Header) // 请求头
+
 	s, _ := ioutil.ReadAll(r.Body)
-	logrus.Println("body = ", string(s)) // 请求包体
-	logrus.Println(r.RemoteAddr, "连接成功") //客户端网络地址
-	//PostPhoneAlert("恭喜发财", "15860837730")
+	var alertNotifyMsg AlertNotifyMsg
+	if err := json.Unmarshal(s, &alertNotifyMsg); err != nil {
+		logrus.Println(err.Error())
+	}
+
+	logrus.Infof("Alerting 告警信息：%s", alertNotifyMsg)
+
+	area := alertNotifyMsg.CommonLabels["AREA"]
+	alertname := alertNotifyMsg.CommonLabels["alertname"]
+	var content string
+	switch alertname {
+	case "HighErrorRate":
+		content = areaMap[area] + "，磁盘使用率超过80%"
+	default:
+		content = areaMap[area] + "，" + alertname
+	}
+	if !strings.EqualFold(reciever, "") {
+		PostPhoneAlert(content, reciever)
+	}
 
 }
