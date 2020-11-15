@@ -68,7 +68,12 @@ func PostPhoneAlert(content, reciever string) {
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Api-Token", apiToken)
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+
+	if err != nil {
+		logrus.Errorf("发送电话告警信息失败（%s）。", err.Error())
+		return
+	}
 	defer resp.Body.Close()
 
 	rbody, err := ioutil.ReadAll(resp.Body)
