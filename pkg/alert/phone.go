@@ -65,8 +65,9 @@ func PhoneAlertHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Println("method = ", r.Method) //请求方法
 	logrus.Println("URL = ", r.URL)       // 浏览器发送请求文件路径
 	logrus.Println("header = ", r.Header) // 请求头
-	logrus.Println("body = ", r.Body)     // 请求包体
-	logrus.Println(r.RemoteAddr, "连接成功")  //客户端网络地址
+	s, _ := ioutil.ReadAll(r.Body)
+	logrus.Println("body = ", string(s)) // 请求包体
+	logrus.Println(r.RemoteAddr, "连接成功") //客户端网络地址
 	//PostPhoneAlert("恭喜发财", "15860837730")
-	w.Write([]byte("hello http server"))
+
 }
