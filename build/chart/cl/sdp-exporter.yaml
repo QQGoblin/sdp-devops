@@ -35,10 +35,6 @@ spec:
             - mountPath: /host/proc
               name: proc
               readOnly: true
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
         - name: sdp-exporter-slow
           image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
           command: ["/bin/sdp-exporter"]

@@ -24,10 +24,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
       priority: 0
       tolerations:
         - key: "node-role.kubernetes.io/master"
