@@ -9,6 +9,7 @@ require (
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/modood/table v0.0.0-20200225102042-88de94bb9876
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.8.0
 	github.com/prometheus/common v0.15.0 // indirect
