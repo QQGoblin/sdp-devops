@@ -16,7 +16,7 @@ spec:
         - name: sdp-alert
           image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
           command: ["/bin/sdp-alert"]
-          args:  [ "--reciever", "xxxxxx" ]
+          args:  [ "--reciever", "xxxxxx","--falcon-server","alarm-assist.falcon.in.sdp:6063"]
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
@@ -29,6 +29,7 @@ metadata:
   labels:
     name: sdp-alert
 spec:
+  type: NodePort
   ports:
     - name: http
       port: 8080

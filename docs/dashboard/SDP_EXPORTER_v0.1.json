@@ -18,43 +18,7 @@
   "graphTooltip": 0,
   "id": 6,
   "iteration": 1605494280512,
-  "links": [
-    {
-      "icon": "external link",
-      "tags": [],
-      "targetBlank": true,
-      "title": "更新node_exporter",
-      "tooltip": "",
-      "type": "link",
-      "url": "https://github.com/prometheus/node_exporter/releases"
-    },
-    {
-      "icon": "external link",
-      "tags": [],
-      "targetBlank": true,
-      "title": "更新当前仪表板",
-      "tooltip": "",
-      "type": "link",
-      "url": "https://grafana.com/dashboards/8919"
-    },
-    {
-      "icon": "external link",
-      "tags": [],
-      "targetBlank": true,
-      "title": "StarsL.cn",
-      "tooltip": "",
-      "type": "link",
-      "url": "https://starsl.cn"
-    },
-    {
-      "asDropdown": true,
-      "icon": "external link",
-      "tags": [],
-      "targetBlank": true,
-      "title": "",
-      "type": "dashboards"
-    }
-  ],
+  "links": [],
   "panels": [
     {
       "collapsed": false,
@@ -816,6 +780,5 @@
   },
   "timezone": "browser",
   "title": "SDP_EXPORTER",
-  "uid": "ssU1YE2Mz",
   "version": 32
 }
