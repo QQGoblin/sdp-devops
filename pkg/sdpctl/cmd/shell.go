@@ -11,6 +11,7 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"os"
 	"sdp-devops/pkg/sdpctl/config"
+	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
@@ -28,7 +29,7 @@ func RunShell(cmd *cobra.Command, args []string) {
 
 	cmdStr := strings.Join(args, " ")
 	// 返回所有需要运行运行的Node列表
-	shellPodTargets := k8stools.GetShellPodDict(kubeClientSet)
+	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet)
 	i := 0
 	threadNum := 0
 	total := len(shellPodTargets)

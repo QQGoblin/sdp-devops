@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sdp-devops/pkg/sdpctl/config"
+	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	metricstools "sdp-devops/pkg/util/metrics"
 	"sort"
@@ -44,7 +45,7 @@ func RunNode(cmd *cobra.Command, args []string) {
 		panic(err.Error())
 	}
 	nodeInfoList := make([]NodeInfo, len(nodes.Items))
-	shellPods := k8stools.GetShellPodDict(kubeClientSet)
+	shellPods := sdpk8s.GetShellPodDict(kubeClientSet)
 	allPodDist, _ := k8stools.GetPodDict(kubeClientSet, "")
 	for i, node := range nodes.Items {
 		// 获取Role以及Label信息

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"sdp-devops/pkg/sdpctl/config"
+	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
@@ -15,9 +16,7 @@ import (
 )
 
 var (
-	distNodename string
-	distNodefile string
-	timeOut      int
+	timeOut int
 )
 
 func RunDist(cmd *cobra.Command, args []string) {
@@ -35,7 +34,7 @@ func RunDist(cmd *cobra.Command, args []string) {
 
 	kubeClientSet, kubeClientConfig := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 	// 返回所有需要运行运行的Node列表
-	shellPodTargets := k8stools.GetShellPodDict(kubeClientSet)
+	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet)
 	i := 0
 	for _, v := range shellPodTargets {
 		logrus.Print("------------------------------> No." + strconv.Itoa(i) + " Dist on node: " + v.Spec.NodeName + " <------------------------------")
@@ -53,10 +52,14 @@ func RunDist(cmd *cobra.Command, args []string) {
 
 		go func() {
 			defer writer.Close()
-			systools.MakeTar(srcPath, destPath, writer)
+			if err := systools.MakeTar(srcPath, destPath, writer); err != nil {
+				logrus.Error(err.Error())
+			}
 		}()
 
-		k8stools.ExecCmd(kubeClientSet, kubeClientConfig, v, tarExecOps)
+		if err := k8stools.ExecCmd(kubeClientSet, kubeClientConfig, v, tarExecOps); err != nil {
+			logrus.Error(err.Error())
+		}
 		i += 1
 	}
 }

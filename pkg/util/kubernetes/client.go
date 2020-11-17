@@ -4,7 +4,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"sdp-devops/pkg/sdpctl/config"
 	"strings"
 )
 
@@ -31,7 +30,7 @@ func KubeClientByConfig(configStr string) *kubernetes.Clientset {
 
 // 获取Kube Client 客户端
 func KubeClientAndConfig(configStr string) (*kubernetes.Clientset, *restclient.Config) {
-	kubeClientConfig, err := clientcmd.BuildConfigFromFlags("", config.KubeConfigStr)
+	kubeClientConfig, err := clientcmd.BuildConfigFromFlags("", configStr)
 	if err != nil {
 		panic(err.Error())
 	}
