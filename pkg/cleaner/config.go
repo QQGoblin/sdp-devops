@@ -28,7 +28,7 @@ var (
 )
 
 const (
-	CLEAN_MSG = "\"===================== Clean by SDP-Cleaner! This file is too larger! =====================\""
+	CLEAN_MSG = ""
 )
 
 func AddFlags(flags *pflag.FlagSet) {
