@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=v0.4.2
+VERSION=v0.4.3
 IMAGE=wxext-registry.101.com/sdp/sdp-devops
 
 cd ../
