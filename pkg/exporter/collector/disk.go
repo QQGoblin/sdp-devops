@@ -6,7 +6,6 @@ import (
 	"github.com/toolkits/nux"
 	"os"
 	"sdp-devops/pkg/exporter/config"
-	"sdp-devops/pkg/logger"
 	"strings"
 )
 
