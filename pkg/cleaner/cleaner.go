@@ -28,7 +28,7 @@ func echo(filepath string) {
 		Time:   time.Now(),
 	}
 	cleanNStr, _ := json.Marshal(cleanN)
-	cmd := exec.Command("/bin/sh", "-c", "echo "+string(cleanNStr)+" > "+filepath)
+	cmd := exec.Command("/bin/sh", "-c", "echo "+strings.ReplaceAll(string(cleanNStr), "\"", "\\\"")+" > "+filepath)
 	err := cmd.Run()
 	if err != nil {
 		logrus.Errorf("清空文件失败：%s (%s)", filepath, err.Error())
