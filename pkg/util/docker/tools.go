@@ -2,7 +2,9 @@ package docker
 
 import (
 	"context"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/sirupsen/logrus"
 	"path"
 	"sdp-devops/pkg/util/sys"
 	"strings"
@@ -10,6 +12,7 @@ import (
 
 var (
 	defaultAPIVerison = "1.25"
+	DockerInfo        types.Info
 )
 
 // 返回Docker Client
@@ -33,7 +36,8 @@ func DockerClient(host string) *client.Client {
 func ContainerSize(containerID string, cli *client.Client) int64 {
 	containerInfo, err := cli.ContainerInspect(context.Background(), containerID)
 	if err != nil {
-		panic(err.Error())
+		logrus.Error(err.Error())
+		return 0
 	}
 	upperDir := containerInfo.GraphDriver.Data["UpperDir"]
 	// TODO: 这里改成系统调用会不会更快？
@@ -42,12 +46,9 @@ func ContainerSize(containerID string, cli *client.Client) int64 {
 }
 
 // 获取容器日志的磁盘使用空间
-func ContainerLogSize(containerID string, cli *client.Client) int64 {
-	dockerInfo, err := cli.Info(context.Background())
-	if err != nil {
-		panic(err.Error())
-	}
-	containerDataPath := path.Join(dockerInfo.DockerRootDir, "containers", containerID)
+func ContainerLogSize(containerID, dockerRootDir string, cli *client.Client) int64 {
+
+	containerDataPath := path.Join(dockerRootDir, "containers", containerID)
 	logSize, _ := sys.CalDirSize(containerDataPath)
 	return logSize
 }

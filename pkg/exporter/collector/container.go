@@ -71,11 +71,10 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 			logrus.Warnf("%s 没有正常运行，状态：%s\n", pod.Name, pod.Status.Phase)
 			continue
 		}
-		var containerSize int64
-		var dockerLogSize int64
+		var containerSize, dockerLogSize int64
 		for _, container := range pod.Status.ContainerStatuses {
 			containerId := strings.Replace(container.ContainerID, "docker://", "", -1)
-			dockerLogSize += dockertools.ContainerLogSize(containerId, dockercli)
+			dockerLogSize += dockertools.ContainerLogSize(containerId, config.DockerRootDir, dockercli)
 			containerSize += dockertools.ContainerSize(containerId, dockercli)
 		}
 		tomcatLogDirPath := path.Join(config.TomcatLogDir, pod.Name)

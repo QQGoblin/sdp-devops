@@ -10,6 +10,7 @@ var (
 	ExcludingCol       string
 	IncludingCol       string
 	MetricsURL         string
+	DockerRootDir      string
 )
 
 func AddFlags(flags *pflag.FlagSet) {
@@ -20,5 +21,5 @@ func AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&ExcludingCol, "excluding", "", "采集器名单黑名单，使用逗号分隔。")
 	flags.StringVar(&IncludingCol, "including", "", "采集器名单白名单，使用逗号分隔。优先于黑名单")
 	flags.StringVar(&MetricsURL, "url", "/metrics", "采集器地址。")
-
+	flags.StringVar(&DockerRootDir, "docker-root-dir", "/data/var/lib/docker", "Docker Enginer 根目录。")
 }
