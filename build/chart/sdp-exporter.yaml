@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: sdp-exporter
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
           command: ["/bin/sdp-exporter"]
           args:  [ "--excluding","container"]
           imagePullPolicy: Always
@@ -36,7 +36,7 @@ spec:
               name: proc
               readOnly: true
         - name: sdp-exporter-slow
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
           command: ["/bin/sdp-exporter"]
           args:  [ "--including","container","--port","17001" ]
           imagePullPolicy: Always

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sdp-alert
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.2
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
           command: ["/bin/sdp-alert"]
           args:  [ "--reciever", "xxxxxx","--falcon-server","alarm-assist.falcon.in.sdp:6063"]
           ports:
