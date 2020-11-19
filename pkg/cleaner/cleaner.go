@@ -1,6 +1,7 @@
 package cleaner
 
 import (
+	"encoding/json"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -13,9 +14,21 @@ import (
 	"time"
 )
 
+type CleanNotification struct {
+	Log    string    `json:"log"`
+	Stream string    `json:"stream"`
+	Time   time.Time `json:"time"`
+}
+
 func echo(filepath string) {
 
-	cmd := exec.Command("/bin/sh", "-c", "echo "+CLEAN_MSG+" > "+filepath)
+	cleanN := CleanNotification{
+		Log:    CLEAN_MSG,
+		Stream: "stderr",
+		Time:   time.Now(),
+	}
+	cleanNStr, _ := json.Marshal(cleanN)
+	cmd := exec.Command("/bin/sh", "-c", "echo "+string(cleanNStr)+" > "+filepath)
 	err := cmd.Run()
 	if err != nil {
 		logrus.Errorf("清空文件失败：%s (%s)", filepath, err.Error())
