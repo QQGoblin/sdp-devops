@@ -59,7 +59,7 @@ func ContainerLogSize(containerID, dockerRootDir string, cli *client.Client) int
 // k8s_POD_${POD_FULL_NAME}_${NAMESPACES}_${POD_ID}_${Restart_Count}
 // k8s_${Container_NAME}_${POD_FULL_NAME}_${NAMESPACES}_${POD_ID}_${Restart_Count}
 //
-func GetPodInfo(cli *client.Client) *[]entity.PodBriefInfo {
+func GetPodInfo(cli *client.Client) []entity.PodBriefInfo {
 
 	podBriefInfoList := make([]entity.PodBriefInfo, 0)
 	if containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{}); err != nil {
@@ -95,5 +95,5 @@ func GetPodInfo(cli *client.Client) *[]entity.PodBriefInfo {
 			}
 		}
 	}
-	return &podBriefInfoList
+	return podBriefInfoList
 }

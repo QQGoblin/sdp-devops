@@ -30,7 +30,7 @@ func Main() {
 	rootCmd.AddCommand(cmd.NewCmdDeploy())
 	rootCmd.AddCommand(cmd.NewCmdSh())
 	rootCmd.AddCommand(cmd.NewCmdDist())
-	//rootCmd.AddCommand(cmd.NewCmdCrawler())
+	rootCmd.AddCommand(cmd.NewCmdShellDockerNet())
 	//rootCmd.AddCommand(cmd.NewCmdCheck())
 
 	if err := execute(rootCmd); err != nil {
