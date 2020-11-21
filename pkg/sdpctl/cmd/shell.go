@@ -73,7 +73,7 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 func NewCmdSh() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "sh [command]",
-		Short:                 "在宿主机的客户端中执行Shell命令,不支持管道、&、重定向等Shell操作符，慎用！！！",
+		Short:                 "在宿主机的客户端中执行Shell命令,请用“--”分隔开Shell命令，慎用！！！",
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			RunShell(cmd, args)
