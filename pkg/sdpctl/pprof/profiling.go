@@ -36,7 +36,7 @@ func FlushProfiling() error {
 	case "time":
 		stopTime = time.Now()
 		duration := stopTime.Sub(startTime)
-		fmt.Printf("命令耗时 %f 秒。", duration.Seconds())
+		fmt.Printf("命令耗时 %f 秒。\n", duration.Seconds())
 	default:
 	}
 
