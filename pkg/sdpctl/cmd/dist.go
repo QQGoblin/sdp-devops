@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"io"
 	"os"
 	"path"
@@ -13,10 +12,6 @@ import (
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
 	"strings"
-)
-
-var (
-	timeOut int
 )
 
 func RunDist(cmd *cobra.Command, args []string) {
@@ -47,7 +42,7 @@ func RunDist(cmd *cobra.Command, args []string) {
 			Out:           os.Stdout,
 			Err:           os.Stderr,
 			Istty:         false,
-			TimeOut:       timeOut,
+			TimeOut:       config.FileDistTimeOut,
 		}
 
 		go func() {
@@ -64,10 +59,6 @@ func RunDist(cmd *cobra.Command, args []string) {
 	}
 }
 
-func addDistFlag(flags *pflag.FlagSet) {
-	flags.IntVar(&timeOut, "timeout", 15, "单个文件传输超时时间。")
-}
-
 func NewCmdDist() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "dist [local file path] [dist folder path]",
@@ -77,6 +68,6 @@ func NewCmdDist() *cobra.Command {
 			RunDist(cmd, args)
 		},
 	}
-	addDistFlag(cmd.Flags())
+	config.AddDistFlags(cmd.Flags())
 	return cmd
 }

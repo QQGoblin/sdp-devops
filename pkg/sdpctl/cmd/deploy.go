@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"sdp-devops/pkg/sdpctl/config"
+	"sdp-devops/pkg/util/entity"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	"strings"
 	"time"
@@ -125,13 +126,6 @@ func RunClean(cmd *cobra.Command, args []string) {
 	logrus.Info("清理命名空间", config.ShellNamespace, "成功！")
 }
 
-// 打印Pod的状态信息
-type PodSimpleInfo struct {
-	Name   string
-	Status string
-	Node   string
-}
-
 func PrintPodSimpleInfo(kubeClientSet *kubernetes.Clientset, namespace, lableSelector string) {
 
 	pods, err := kubeClientSet.CoreV1().Pods(namespace).List(metav1.ListOptions{
@@ -141,12 +135,13 @@ func PrintPodSimpleInfo(kubeClientSet *kubernetes.Clientset, namespace, lableSel
 	if err != nil {
 		panic(err.Error())
 	}
-	podInfoList := make([]PodSimpleInfo, len(pods.Items))
+	podInfoList := make([]entity.PodBriefInfo, len(pods.Items))
 	for i := 0; i < len(pods.Items); i++ {
-		podInfo := PodSimpleInfo{
-			Name:   pods.Items[i].Name,
-			Status: string(pods.Items[i].Status.Phase),
-			Node:   pods.Items[i].Status.HostIP,
+		podInfo := entity.PodBriefInfo{
+			Name:      pods.Items[i].Name,
+			NameSpace: config.ShellNamespace,
+			Status:    string(pods.Items[i].Status.Phase),
+			Node:      pods.Items[i].Status.HostIP,
 		}
 		podInfoList[i] = podInfo
 

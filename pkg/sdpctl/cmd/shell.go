@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -16,11 +15,6 @@ import (
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
 	"strings"
-)
-
-var (
-	httpTimeOutInSec int
-	currentThreadNum int
 )
 
 func RunShell(cmd *cobra.Command, args []string) {
@@ -48,7 +42,7 @@ func RunShell(cmd *cobra.Command, args []string) {
 				Out:           outPutBuffer,
 				Err:           os.Stderr,
 				Istty:         false,
-				TimeOut:       httpTimeOutInSec,
+				TimeOut:       config.HttpTimeOutInSec,
 			}
 			go execCmdParallel(kubeClientSet, kubeClientConfig, pod, shExecOps, tChan)
 			threadNum += 1
@@ -56,8 +50,8 @@ func RunShell(cmd *cobra.Command, args []string) {
 			outPutBuffer.WriteString("Can't find shell pod on " + n + "\n")
 		}
 		i += 1
-		if threadNum == currentThreadNum || total == i {
-			systools.WaitAllThreadFinish(threadNum, tChan, httpTimeOutInSec)
+		if threadNum == config.CurrentThreadNum || total == i {
+			systools.WaitAllThreadFinish(threadNum, tChan, config.HttpTimeOutInSec)
 			threadNum = 0
 		}
 	}
@@ -76,12 +70,6 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 	tChan <- 1
 }
 
-func addShFlag(flags *pflag.FlagSet) {
-
-	flags.IntVar(&httpTimeOutInSec, "timeout", 30, "连接Kubelet超时时间。")
-	flags.IntVar(&currentThreadNum, "thread", 1, "执行shell命令的并发数。")
-}
-
 func NewCmdSh() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "sh [command]",
@@ -91,6 +79,6 @@ func NewCmdSh() *cobra.Command {
 			RunShell(cmd, args)
 		},
 	}
-	addShFlag(cmd.Flags())
+	config.AddShellFlags(cmd.Flags())
 	return cmd
 }
