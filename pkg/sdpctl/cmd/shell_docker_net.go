@@ -17,7 +17,7 @@ func RunShellDockerNet(cmd *cobra.Command, args []string) {
 
 	for i, podBriefInfo := range podBriefInfoList {
 		fmt.Println("============================= No.", i, " POD: ", podBriefInfo.Name, " =============================")
-		if outStr, err := sys.CmdOut("nsenter", "-t", strconv.Itoa(podBriefInfo.PID), "-n", cmdStr); err != nil {
+		if outStr, err := sys.CmdOut("/usr/bin/nsenter", "-t", strconv.Itoa(podBriefInfo.PID), "-n", cmdStr); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			fmt.Println(outStr)
