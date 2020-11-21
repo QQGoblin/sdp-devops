@@ -20,7 +20,7 @@ require (
 	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07 // indirect
 	github.com/toolkits/nux v0.0.0-20200401110743-debb3829764a
 	github.com/toolkits/slice v0.0.0-20141116085117-e44a80af2484 // indirect
-	github.com/toolkits/sys v0.0.0-20170615103026-1f33b217ffaf // indirect
+	github.com/toolkits/sys v0.0.0-20170615103026-1f33b217ffaf
 	golang.org/x/sys v0.0.0-20201113233024-12cec1faf1ba // indirect
 	k8s.io/api v0.16.15
 	k8s.io/apimachinery v0.16.15
