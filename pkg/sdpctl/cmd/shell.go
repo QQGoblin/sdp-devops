@@ -36,7 +36,7 @@ func RunShell(cmd *cobra.Command, args []string) {
 		outPutBuffers[i] = outPutBuffer
 		if pod != nil {
 			shExecOps := k8stools.ExecOptions{
-				Command:       "/bin/sh -c " + cmdStr,
+				Command:       cmdStr,
 				ContainerName: "",
 				In:            nil,
 				Out:           outPutBuffer,
