@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/toolkits/sys"
 	dockertools "sdp-devops/pkg/util/docker"
+	systools "sdp-devops/pkg/util/sys"
 	"strconv"
 	"strings"
 )
@@ -16,8 +16,9 @@ func RunShellDockerNet(cmd *cobra.Command, args []string) {
 	podBriefInfoList := dockertools.GetPodInfo(cli)
 
 	for i, podBriefInfo := range podBriefInfoList {
-		fmt.Println("============================= No.", i, " POD: ", podBriefInfo.Name, " =============================")
-		if outStr, err := sys.CmdOut("/usr/bin/nsenter", "-t", strconv.Itoa(podBriefInfo.PID), "-n", cmdStr); err != nil {
+		fmt.Println("============================= No.", i, "POD:", podBriefInfo.Name, "=============================")
+		if outStr, errStr, err := systools.CmdOutErr("/usr/bin/nsenter", "-t", strconv.Itoa(podBriefInfo.PID), "-n", "sleep 1"); err != nil {
+			fmt.Println(errStr)
 			fmt.Println(err.Error())
 		} else {
 			fmt.Println(outStr)
