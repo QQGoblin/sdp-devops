@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"sdp-devops/pkg/sdpctl/config"
-	"sdp-devops/pkg/util/entity"
+	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	"strings"
 	"time"
@@ -17,7 +17,7 @@ import (
 
 func RunInstall(cmd *cobra.Command, args []string) {
 
-	kubeClientSet := k8stools.KubeClientByConfig(config.KubeConfigStr)
+	kubeClientSet, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 
 	if _, err := kubeClientSet.AppsV1().DaemonSets(config.ShellNamespace).Get(config.ShellDaemonset, metav1.GetOptions{
 		TypeMeta:        metav1.TypeMeta{},
@@ -106,7 +106,7 @@ func RunInstall(cmd *cobra.Command, args []string) {
 
 func RunClean(cmd *cobra.Command, args []string) {
 
-	kubeClientSet := k8stools.KubeClientByConfig(config.KubeConfigStr)
+	kubeClientSet, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 
 	if _, err := kubeClientSet.CoreV1().Namespaces().Get(config.ShellNamespace, metav1.GetOptions{
 		TypeMeta: metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"},
@@ -135,9 +135,9 @@ func PrintPodSimpleInfo(kubeClientSet *kubernetes.Clientset, namespace, lableSel
 	if err != nil {
 		panic(err.Error())
 	}
-	podInfoList := make([]entity.PodBriefInfo, len(pods.Items))
+	podInfoList := make([]sdpk8s.PodBriefInfo, len(pods.Items))
 	for i := 0; i < len(pods.Items); i++ {
-		podInfo := entity.PodBriefInfo{
+		podInfo := sdpk8s.PodBriefInfo{
 			Name:      pods.Items[i].Name,
 			NameSpace: config.ShellNamespace,
 			Status:    string(pods.Items[i].Status.Phase),

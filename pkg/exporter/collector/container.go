@@ -53,7 +53,7 @@ func NewContainerCollector() (Collector, error) {
 
 // 实现采集接口
 func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
-	k8scli := k8stools.KubeClientByConfig(config.KubeConfigStr)
+	k8scli, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 	dockercli := dockertools.DockerClient("")
 	podDict, err := k8stools.GetPodDict(k8scli, "")
 	if err != nil {

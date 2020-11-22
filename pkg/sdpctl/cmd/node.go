@@ -3,8 +3,12 @@ package cmd
 import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/modood/table"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	metricsv1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
 	"sdp-devops/pkg/sdpctl/config"
 	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
@@ -13,20 +17,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-type NodeInfo struct {
-	Name           string
-	Role           string
-	UnSche         string
-	Env            string
-	Type           string
-	Label          string
-	CPU            string
-	Memory         string
-	MemoryRequests string
-	Pod            string
-	Shell          string
-}
 
 var labelFilter = mapset.NewSet(
 	"beta.kubernetes.io/arch",
@@ -38,14 +28,29 @@ var labelFilter = mapset.NewSet(
 
 func RunNode(cmd *cobra.Command, args []string) {
 
-	kubeClientSet := k8stools.KubeClientByConfig(config.KubeConfigStr)
+	kubeClientSet, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
+	nodes, _ := kubeClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodeMetricsDict := nodeUsage()
+	nodeBriefInfo(kubeClientSet, nodes, nodeMetricsDict)
+}
 
-	nodes, err := kubeClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
-	if err != nil {
-		panic(err.Error())
+func nodeUsage() map[string]metricsv1beta1.NodeMetrics {
+	metricsCli, _ := k8stools.KubeMetricsAndConfig(config.KubeConfigStr)
+	nodeMetricsDict := make(map[string]metricsv1beta1.NodeMetrics)
+	if nodeMetricsList, err := metricsCli.MetricsV1beta1().NodeMetricses().List(metav1.ListOptions{}); err != nil {
+		logrus.Error(err)
+		return nil
+	} else {
+		for _, nodeMetrics := range nodeMetricsList.Items {
+			nodeMetricsDict[nodeMetrics.Name] = nodeMetrics
+		}
 	}
-	nodeInfoList := make([]NodeInfo, len(nodes.Items))
-	shellPods := sdpk8s.GetShellPodDict(kubeClientSet)
+	return nodeMetricsDict
+}
+
+func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, nodeMetricsDict map[string]metricsv1beta1.NodeMetrics) {
+
+	nodeInfoList := make([]sdpk8s.NodeBriefInfo, len(nodes.Items))
 	allPodDist, _ := k8stools.GetPodDict(kubeClientSet, "")
 	for i, node := range nodes.Items {
 		// 获取Role以及Label信息
@@ -72,25 +77,8 @@ func RunNode(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		// 获取ShellPod名称
-		shellPod := shellPods[node.Name]
-		shellPodName := ""
-		if shellPod != nil {
-			shellPodName = shellPod.Name
-		}
-
 		// 列出获取该节点的所有Pod
 		podListOnNode := allPodDist[node.Name]
-
-		// 计算Pod申请的内存资源
-		var nodeReqMemory int64 = 0
-		nodeCapMemory := node.Status.Capacity.Memory().Value()
-		for _, pod := range podListOnNode {
-			for _, c := range pod.Spec.Containers {
-				nodeReqMemory += c.Resources.Requests.Memory().Value()
-			}
-		}
-		reqMemoryPercentage := float64(nodeReqMemory) / float64(nodeCapMemory)
 
 		// 获取节点的状态
 		var unschedulable = ""
@@ -98,18 +86,36 @@ func RunNode(cmd *cobra.Command, args []string) {
 			unschedulable = "Y"
 		}
 
-		nodeInfo := NodeInfo{
-			node.Name,
-			role,
-			unschedulable,
-			strings.Join(envLabel, ","),
-			strings.Join(typeLabel, ","),
-			strings.Join(commonLabel, ","),
-			node.Status.Capacity.Cpu().String(),
-			metricstools.FormatByte(nodeCapMemory),
-			metricstools.FormatByte(nodeReqMemory) + " (" + strconv.FormatFloat(reqMemoryPercentage*100, 'f', 2, 64) + "%)",
-			strconv.Itoa(len(podListOnNode)) + "/" + node.Status.Capacity.Pods().String(),
-			shellPodName,
+		// 获取节点CPU/内存使用情况
+		// 计算Pod申请的内存资源
+		var memoryRequest int64 = 0
+		var memoryLimits int64 = 0
+		for _, pod := range podListOnNode {
+			for _, c := range pod.Spec.Containers {
+				memoryRequest += c.Resources.Requests.Memory().Value()
+				memoryLimits += c.Resources.Limits.Memory().Value()
+			}
+		}
+
+		nodeMetrics := nodeMetricsDict[node.Name]
+		memoryUsageStr := metricstools.FormatByte(nodeMetrics.Usage.Memory().Value())
+		memoryCapacityStr := metricstools.FormatByte(node.Status.Capacity.Memory().Value())
+		memoryRequestStr := metricstools.FormatByte(memoryRequest)
+		memoryLimitsStr := metricstools.FormatByte(memoryLimits)
+
+		nodeInfo := sdpk8s.NodeBriefInfo{
+			Name:          node.Name,
+			Role:          role,
+			UnSche:        unschedulable,
+			Env:           strings.Join(envLabel, ","),
+			Type:          strings.Join(typeLabel, ","),
+			Label:         strings.Join(commonLabel, ","),
+			CPU:           node.Status.Capacity.Cpu().String(),
+			Memory:        memoryCapacityStr,
+			MemoryUsage:   memoryUsageStr + "(" + metricstools.FormatPercentage(nodeMetrics.Usage.Memory().Value(), node.Status.Capacity.Memory().Value()) + ")",
+			MemoryRequest: memoryRequestStr + "(" + metricstools.FormatPercentage(memoryRequest, node.Status.Capacity.Memory().Value()) + ")",
+			MemoryLimits:  memoryLimitsStr + "(" + metricstools.FormatPercentage(memoryLimits, node.Status.Capacity.Memory().Value()) + ")",
+			Pod:           strconv.Itoa(len(podListOnNode)) + "/" + node.Status.Capacity.Pods().String(),
 		}
 		nodeInfoList[i] = nodeInfo
 	}

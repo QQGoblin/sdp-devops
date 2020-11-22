@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"sdp-devops/pkg/sdpctl/sdpk8s"
 	dockertools "sdp-devops/pkg/util/docker"
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
@@ -18,7 +19,7 @@ func RunShellDockerNet(cmd *cobra.Command, args []string) {
 
 	cmdStr := strings.Join(args, " ")
 	cli := dockertools.DockerClient("")
-	podBriefInfoList := dockertools.GetPodInfo(cli)
+	podBriefInfoList := sdpk8s.GetPodInfo(cli)
 
 	for i, podBriefInfo := range podBriefInfoList {
 		fmt.Println("============================= No.", i, "POD:", podBriefInfo.Name, "=============================")

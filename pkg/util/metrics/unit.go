@@ -27,3 +27,8 @@ func FormatByte(b int64) string {
 
 	return strconv.FormatFloat(float64(b), 'f', 2, 64)
 }
+
+func FormatPercentage(usage int64, total int64) string {
+	percentage := float64(usage) / float64(total)
+	return strconv.FormatFloat(percentage*100, 'f', 2, 64) + "%"
+}
