@@ -44,5 +44,6 @@ func KubeConfg(configStr string) (config *restclient.Config, err error) {
 	} else {
 		config, err = clientcmd.BuildConfigFromFlags("", configStr)
 	}
+	config.Insecure = true
 	return config, err
 }
