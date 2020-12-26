@@ -2,7 +2,7 @@ package cmd
 
 import (
 	mapset "github.com/deckarep/golang-set"
-	"github.com/modood/table"
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/api/core/v1"
@@ -13,6 +13,7 @@ import (
 	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	metricstools "sdp-devops/pkg/util/metrics"
+	"sdp-devops/pkg/util/table"
 	"sort"
 	"strconv"
 	"strings"
@@ -117,6 +118,13 @@ func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, node
 			MemoryLimits:  memoryLimitsStr + "(" + metricstools.FormatPercentage(memoryLimits, node.Status.Capacity.Memory().Value()) + ")",
 			Pod:           strconv.Itoa(len(podListOnNode)) + "/" + node.Status.Capacity.Pods().String(),
 		}
+
+		if len(podListOnNode) > 80 {
+			nodeInfo.Pod = color.HiYellowString(nodeInfo.Pod)
+		} else if len(podListOnNode) < 30 {
+			nodeInfo.Pod = color.HiGreenString(nodeInfo.Pod)
+		}
+
 		nodeInfoList[i] = nodeInfo
 	}
 	sort.Slice(nodeInfoList, func(i, j int) bool {

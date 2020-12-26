@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/modood/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	appv1 "k8s.io/api/apps/v1"
@@ -11,6 +10,7 @@ import (
 	"sdp-devops/pkg/sdpctl/config"
 	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
+	"sdp-devops/pkg/util/table"
 	"strings"
 	"time"
 )

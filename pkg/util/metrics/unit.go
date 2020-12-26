@@ -1,6 +1,9 @@
 package metrics
 
-import "strconv"
+import (
+	"github.com/fatih/color"
+	"strconv"
+)
 
 var (
 	KB int64 = 1024
@@ -30,5 +33,13 @@ func FormatByte(b int64) string {
 
 func FormatPercentage(usage int64, total int64) string {
 	percentage := float64(usage) / float64(total)
-	return strconv.FormatFloat(percentage*100, 'f', 2, 64) + "%"
+	var colorStr string
+	if percentage > 0.8 {
+		colorStr = color.HiRedString(strconv.FormatFloat(percentage*100, 'f', 2, 64) + "%")
+	} else if percentage > 0.6 {
+		colorStr = color.HiYellowString(strconv.FormatFloat(percentage*100, 'f', 2, 64) + "%")
+	} else {
+		colorStr = color.HiGreenString(strconv.FormatFloat(percentage*100, 'f', 2, 64) + "%")
+	}
+	return colorStr
 }
