@@ -6,6 +6,6 @@ var (
 	action string
 )
 
-func AddDeployFlags(flags *pflag.FlagSet) {
+func AddNodeShellFlags(flags *pflag.FlagSet) {
 	flags.StringVarP(&action, "action", "a", "check", "相关操作名称。")
 }

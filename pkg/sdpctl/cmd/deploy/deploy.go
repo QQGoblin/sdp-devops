@@ -11,7 +11,6 @@ func NewCmdDeploy() *cobra.Command {
 		Short:                 "部署相关服务",
 		DisableFlagsInUseLine: true,
 	}
-	AddDeployFlags(cmd.Flags())
 	cmd.AddCommand(NewCmdNodeShell())
 	return cmd
 }
@@ -35,5 +34,6 @@ func NewCmdNodeShell() *cobra.Command {
 			}
 		},
 	}
+	AddNodeShellFlags(cmd.Flags())
 	return cmd
 }
