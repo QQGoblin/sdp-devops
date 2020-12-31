@@ -17,7 +17,7 @@ func NewCmdGet() *cobra.Command {
 func NewCmdNode() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "node",
-		Short:                 "打印更加细致的集群信息",
+		Short:                 "打印节点信息",
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			node(cmd, args)

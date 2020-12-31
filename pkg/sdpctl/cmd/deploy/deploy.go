@@ -9,7 +9,7 @@ import (
 func NewCmdDeploy() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "deploy",
-		Short:                 "在集群部署基于Daemonset的Shell客户端",
+		Short:                 "部署相关服务",
 		DisableFlagsInUseLine: true,
 	}
 	config.AddDeployFlags(cmd.Flags())
@@ -19,7 +19,7 @@ func NewCmdDeploy() *cobra.Command {
 
 func NewCmdNodeShell() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   "install",
+		Use:                   "node-shell",
 		Short:                 "安装Shell Pod服务",
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
