@@ -1,4 +1,4 @@
-package cmd
+package shell
 
 import (
 	"bytes"
@@ -17,13 +17,13 @@ import (
 	"strings"
 )
 
-func RunShell(cmd *cobra.Command, args []string) {
+func nodeShell(cmd *cobra.Command, args []string) {
 
 	kubeClientSet, kubeClientConfig := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 
 	cmdStr := strings.Join(args, " ")
 	// 返回所有需要运行运行的Node列表
-	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet)
+	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet, targetNode, targetNodeFile)
 	i := 0
 	threadNum := 0
 	total := len(shellPodTargets)
@@ -42,7 +42,7 @@ func RunShell(cmd *cobra.Command, args []string) {
 				Out:           outPutBuffer,
 				Err:           os.Stderr,
 				Istty:         false,
-				TimeOut:       config.HttpTimeOutInSec,
+				TimeOut:       httpTimeOutInSec,
 			}
 			go execCmdParallel(kubeClientSet, kubeClientConfig, pod, shExecOps, tChan)
 			threadNum += 1
@@ -50,8 +50,8 @@ func RunShell(cmd *cobra.Command, args []string) {
 			outPutBuffer.WriteString("Can't find shell pod on " + n + "\n")
 		}
 		i += 1
-		if threadNum == config.CurrentThreadNum || total == i {
-			systools.WaitAllThreadFinish(threadNum, tChan, config.HttpTimeOutInSec)
+		if threadNum == currentThreadNum || total == i {
+			systools.WaitAllThreadFinish(threadNum, tChan, httpTimeOutInSec)
 			threadNum = 0
 		}
 	}
@@ -68,17 +68,4 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 		//panic(err.Error())
 	}
 	tChan <- 1
-}
-
-func NewCmdSh() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:                   "sh [command]",
-		Short:                 "在宿主机的客户端中执行Shell命令,请用“--”分隔开Shell命令，慎用！！！",
-		DisableFlagsInUseLine: true,
-		Run: func(cmd *cobra.Command, args []string) {
-			RunShell(cmd, args)
-		},
-	}
-	config.AddShellFlags(cmd.Flags())
-	return cmd
 }

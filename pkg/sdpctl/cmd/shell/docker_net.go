@@ -1,4 +1,4 @@
-package cmd
+package shell
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func RunShellDockerNet(cmd *cobra.Command, args []string) {
+func dockerNet(cmd *cobra.Command, args []string) {
 
 	if len(args) < 1 {
 		logrus.Error("请输入要执行的命令")
@@ -31,16 +31,4 @@ func RunShellDockerNet(cmd *cobra.Command, args []string) {
 		}
 	}
 
-}
-
-func NewCmdShellDockerNet() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:                   "sh-docker-net",
-		Short:                 "在当前节点Pod容器的网络空间中执行Shell命令, 基于 nsenter -t ${NET_ID} -n ${CMD}",
-		DisableFlagsInUseLine: true,
-		Run: func(cmd *cobra.Command, args []string) {
-			RunShellDockerNet(cmd, args)
-		},
-	}
-	return cmd
 }

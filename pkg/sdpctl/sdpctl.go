@@ -3,7 +3,9 @@ package sdpctl
 import (
 	"github.com/spf13/cobra"
 	"os"
-	"sdp-devops/pkg/sdpctl/cmd"
+	"sdp-devops/pkg/sdpctl/cmd/deploy"
+	"sdp-devops/pkg/sdpctl/cmd/get"
+	"sdp-devops/pkg/sdpctl/cmd/shell"
 	"sdp-devops/pkg/sdpctl/config"
 	cusPprof "sdp-devops/pkg/sdpctl/pprof"
 )
@@ -23,16 +25,12 @@ func Main() {
 
 	flags := rootCmd.PersistentFlags()
 
-	config.AddFlags(flags)
+	config.AddCommonFlags(flags)
 
 	cusPprof.AddProfilingFlags(flags)
-	rootCmd.AddCommand(cmd.NewCmdNode())
-	rootCmd.AddCommand(cmd.NewCmdDeploy())
-	rootCmd.AddCommand(cmd.NewCmdSh())
-	rootCmd.AddCommand(cmd.NewCmdDist())
-	rootCmd.AddCommand(cmd.NewCmdShellDockerNet())
-	//rootCmd.AddCommand(cmd.NewCmdCheck())
-
+	rootCmd.AddCommand(get.NewCmdGet())
+	rootCmd.AddCommand(deploy.NewCmdDeploy())
+	rootCmd.AddCommand(shell.NewCmdSh())
 	if err := execute(rootCmd); err != nil {
 		os.Exit(1)
 	}

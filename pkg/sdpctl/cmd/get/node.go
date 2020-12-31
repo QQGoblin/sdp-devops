@@ -1,4 +1,4 @@
-package cmd
+package get
 
 import (
 	mapset "github.com/deckarep/golang-set"
@@ -27,7 +27,7 @@ var labelFilter = mapset.NewSet(
 	"kubernetes.io/os",
 )
 
-func RunNode(cmd *cobra.Command, args []string) {
+func node(cmd *cobra.Command, args []string) {
 
 	kubeClientSet, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 	nodes, _ := kubeClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
@@ -131,16 +131,4 @@ func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, node
 		return nodeInfoList[i].Role < nodeInfoList[j].Role
 	})
 	table.Output(nodeInfoList)
-}
-
-func NewCmdNode() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:                   "node",
-		Short:                 "打印更加细致的集群信息",
-		DisableFlagsInUseLine: true,
-		Run: func(cmd *cobra.Command, args []string) {
-			RunNode(cmd, args)
-		},
-	}
-	return cmd
 }

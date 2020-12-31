@@ -16,14 +16,14 @@ import (
 )
 
 // 返回目标节点（Node List）的shell pod列表
-func GetShellPodDict(kubeClientSet *kubernetes.Clientset) map[string]*v1.Pod {
+func GetShellPodDict(kubeClientSet *kubernetes.Clientset, shellNodeName, shellNodeNameFile string) map[string]*v1.Pod {
 
-	shellPods, _ := k8stools.GetPodList(kubeClientSet, config.ShellNamespace, "name="+config.ShellDaemonset)
+	shellPods, _ := k8stools.GetPodList(kubeClientSet, config.ShellToolName, "name="+config.ShellToolName)
 
 	// 根据参数判断需要传在那些Node执行Shell
 	nodeList := make([]string, 0)
 	// 所有Node执行Shell
-	if strings.EqualFold(config.ShellNodeName, "") && strings.EqualFold(config.ShellNodeNameFile, "") {
+	if strings.EqualFold(shellNodeName, "") && strings.EqualFold(shellNodeNameFile, "") {
 		nodes, _ := kubeClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
 		for _, node := range nodes.Items {
 			nodeList = append(nodeList, node.Name)
@@ -31,13 +31,13 @@ func GetShellPodDict(kubeClientSet *kubernetes.Clientset) map[string]*v1.Pod {
 	}
 
 	// 指定Node执行shell
-	if !strings.EqualFold(config.ShellNodeName, "") {
-		nodeList = append(nodeList, config.ShellNodeName)
+	if !strings.EqualFold(shellNodeName, "") {
+		nodeList = append(nodeList, shellNodeName)
 	}
 
 	// nodefile文件指定node执行shell
-	if strings.EqualFold(config.ShellNodeName, "") && !strings.EqualFold(config.ShellNodeNameFile, "") {
-		nodeList = systools.ReadLine(config.ShellNodeNameFile)
+	if strings.EqualFold(shellNodeName, "") && !strings.EqualFold(shellNodeNameFile, "") {
+		nodeList = systools.ReadLine(shellNodeNameFile)
 	}
 	if len(nodeList) == 0 {
 		panic("选择节点异常")
