@@ -15,21 +15,27 @@ func install(cmd *cobra.Command, args []string) {
 
 	kubeClientSet, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 
+	shellNS := v1.Namespace{
+		TypeMeta:   metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"},
+		ObjectMeta: metav1.ObjectMeta{Name: config.ShellToolName},
+	}
+
+	if ns, err := kubeClientSet.CoreV1().Namespaces().Get(config.ShellToolName, metav1.GetOptions{}); err != nil {
+		logrus.Error("Kube API 异常")
+		panic(err.Error())
+	} else if ns == nil {
+		if _, err := kubeClientSet.CoreV1().Namespaces().Create(&shellNS); err != nil {
+			logrus.Error("创建命名空间", config.ShellToolName, "失败")
+			panic(err.Error())
+		}
+	}
+
 	if _, err := kubeClientSet.AppsV1().DaemonSets(config.ShellToolName).Get(config.ShellToolName, metav1.GetOptions{
 		TypeMeta:        metav1.TypeMeta{},
 		ResourceVersion: "",
 	}); err == nil {
 		logrus.Info("服务已经部署")
 		return
-	}
-
-	shellNS := v1.Namespace{
-		TypeMeta:   metav1.TypeMeta{Kind: "Namespace", APIVersion: "v1"},
-		ObjectMeta: metav1.ObjectMeta{Name: config.ShellToolName},
-	}
-	if _, err := kubeClientSet.CoreV1().Namespaces().Create(&shellNS); err != nil {
-		logrus.Error("创建命名空间", config.ShellToolName, "失败")
-		panic(err.Error())
 	}
 
 	isPrivileged := true
