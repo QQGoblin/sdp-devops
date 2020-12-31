@@ -3,7 +3,6 @@ package deploy
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"sdp-devops/pkg/sdpctl/config"
 )
 
 func NewCmdDeploy() *cobra.Command {
@@ -12,7 +11,7 @@ func NewCmdDeploy() *cobra.Command {
 		Short:                 "部署相关服务",
 		DisableFlagsInUseLine: true,
 	}
-	config.AddDeployFlags(cmd.Flags())
+	AddDeployFlags(cmd.Flags())
 	cmd.AddCommand(NewCmdNodeShell())
 	return cmd
 }
@@ -24,7 +23,7 @@ func NewCmdNodeShell() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			switch config.DeployAction {
+			switch deployAction {
 			case "install":
 				install(cmd, args)
 				break
