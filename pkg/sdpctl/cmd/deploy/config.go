@@ -3,9 +3,9 @@ package deploy
 import "github.com/spf13/pflag"
 
 var (
-	deployAction string
+	action string
 )
 
 func AddDeployFlags(flags *pflag.FlagSet) {
-	flags.StringVarP(&deployAction, "deploy-action", "a", "check", "相关操作名称。")
+	flags.StringVarP(&action, "action", "a", "check", "相关操作名称。")
 }

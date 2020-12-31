@@ -23,7 +23,7 @@ func NewCmdNodeShell() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			switch deployAction {
+			switch action {
 			case "install":
 				install(cmd, args)
 				break
