@@ -3,8 +3,8 @@ package sdpctl
 import (
 	"github.com/spf13/cobra"
 	"os"
-	"sdp-devops/pkg/sdpctl/cmd/deploy"
 	"sdp-devops/pkg/sdpctl/cmd/get"
+	"sdp-devops/pkg/sdpctl/cmd/ops"
 	"sdp-devops/pkg/sdpctl/cmd/shell"
 	"sdp-devops/pkg/sdpctl/config"
 	cusPprof "sdp-devops/pkg/sdpctl/pprof"
@@ -13,7 +13,7 @@ import (
 func Main() {
 	var rootCmd = &cobra.Command{
 		Use:   "sdpctl",
-		Short: "ND Kubernetes 运维违规小助手",
+		Short: "ND Kubernetes 运维工具",
 		Run:   runHelp,
 		PersistentPreRunE: func(*cobra.Command, []string) error {
 			return cusPprof.InitProfiling()
@@ -29,7 +29,7 @@ func Main() {
 
 	cusPprof.AddProfilingFlags(flags)
 	rootCmd.AddCommand(get.NewCmdGet())
-	rootCmd.AddCommand(deploy.NewCmdDeploy())
+	rootCmd.AddCommand(ops.NewCmdOps())
 	rootCmd.AddCommand(shell.NewCmdSh())
 	if err := execute(rootCmd); err != nil {
 		os.Exit(1)

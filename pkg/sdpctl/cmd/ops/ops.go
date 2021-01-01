@@ -1,14 +1,14 @@
-package deploy
+package ops
 
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func NewCmdDeploy() *cobra.Command {
+func NewCmdOps() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   "deploy",
-		Short:                 "部署相关服务",
+		Use:                   "ops",
+		Short:                 "管理SDP相关依赖",
 		DisableFlagsInUseLine: true,
 	}
 	cmd.AddCommand(NewCmdNodeShell())
@@ -18,7 +18,7 @@ func NewCmdDeploy() *cobra.Command {
 func NewCmdNodeShell() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "node-shell",
-		Short:                 "安装Shell Pod服务",
+		Short:                 "部署Shell Pod工具",
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
 

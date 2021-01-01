@@ -1,4 +1,4 @@
-package deploy
+package ops
 
 import "github.com/spf13/pflag"
 
