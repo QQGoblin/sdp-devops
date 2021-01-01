@@ -1,4 +1,4 @@
-package ops
+package shell_tool
 
 import "github.com/spf13/pflag"
 
@@ -7,5 +7,5 @@ var (
 )
 
 func AddNodeShellFlags(flags *pflag.FlagSet) {
-	flags.StringVarP(&action, "action", "a", "check", "相关操作名称。")
+	flags.StringVarP(&action, "action", "a", "install", "相关操作名称。")
 }

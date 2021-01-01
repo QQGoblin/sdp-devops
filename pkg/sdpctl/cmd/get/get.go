@@ -13,15 +13,3 @@ func NewCmdGet() *cobra.Command {
 	cmd.AddCommand(NewCmdNode())
 	return cmd
 }
-
-func NewCmdNode() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:                   "node",
-		Short:                 "打印节点信息",
-		DisableFlagsInUseLine: true,
-		Run: func(cmd *cobra.Command, args []string) {
-			node(cmd, args)
-		},
-	}
-	return cmd
-}

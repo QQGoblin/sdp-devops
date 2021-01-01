@@ -1,4 +1,4 @@
-package ops
+package shell_tool
 
 import (
 	"github.com/sirupsen/logrus"
@@ -10,6 +10,29 @@ import (
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	"strings"
 )
+
+func NewCmdShellTool() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                   "node-shell",
+		Short:                 "部署Shell Pod工具",
+		DisableFlagsInUseLine: true,
+		Run: func(cmd *cobra.Command, args []string) {
+
+			switch action {
+			case "install":
+				install(cmd, args)
+				break
+			case "remove":
+				clean(cmd, args)
+				break
+			default:
+				logrus.Error("只支持 install / remove 操作")
+			}
+		},
+	}
+	AddNodeShellFlags(cmd.Flags())
+	return cmd
+}
 
 func install(cmd *cobra.Command, args []string) {
 
