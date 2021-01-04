@@ -1,6 +1,7 @@
 package shell
 
 import (
+	"bytes"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -25,4 +26,10 @@ func NewCmdSh() *cobra.Command {
 	}
 	AddShellFlags(cmd.Flags())
 	return cmd
+}
+
+type OutPut struct {
+	Title  string
+	StdOut *bytes.Buffer
+	StdErr *bytes.Buffer
 }

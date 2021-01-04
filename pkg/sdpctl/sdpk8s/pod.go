@@ -8,7 +8,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"sdp-devops/pkg/sdpctl/config"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
 	"strconv"
@@ -16,9 +15,9 @@ import (
 )
 
 // 返回目标节点（Node List）的shell pod列表
-func GetShellPodDict(kubeClientSet *kubernetes.Clientset, shellNodeName, shellNodeNameFile string) map[string]*v1.Pod {
+func GetShellPodDict(kubeClientSet *kubernetes.Clientset, shellNodeName, shellNodeNameFile, toolName string) map[string]*v1.Pod {
 
-	shellPods, _ := k8stools.GetPodList(kubeClientSet, config.ShellToolName, "name="+config.ShellToolName)
+	shellPods, _ := k8stools.GetPodList(kubeClientSet, toolName, "name="+toolName)
 
 	// 根据参数判断需要传在那些Node执行Shell
 	nodeList := make([]string, 0)

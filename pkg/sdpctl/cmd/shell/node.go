@@ -3,6 +3,7 @@ package shell
 import (
 	"bytes"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/api/core/v1"
@@ -13,7 +14,6 @@ import (
 	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
 	systools "sdp-devops/pkg/util/sys"
-	"strconv"
 	"strings"
 )
 
@@ -23,31 +23,36 @@ func nodeShell(cmd *cobra.Command, args []string) {
 
 	cmdStr := strings.Join(args, " ")
 	// 返回所有需要运行运行的Node列表
-	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet, targetNode, targetNodeFile)
+	shellPodTargets := sdpk8s.GetShellPodDict(kubeClientSet, targetNode, targetNodeFile, toolName)
 	i := 0
 	threadNum := 0
 	total := len(shellPodTargets)
 	tChan := make(chan int, len(shellPodTargets))
-	outPutBuffers := make([]*bytes.Buffer, len(shellPodTargets))
+	outPuts := make([]OutPut, len(shellPodTargets))
 	defer close(tChan)
 
 	for n, pod := range shellPodTargets {
-		outPutBuffer := bytes.NewBufferString("------------------------------> No." + strconv.Itoa(i) + " Shell on node: " + n + " <------------------------------\n")
-		outPutBuffers[i] = outPutBuffer
+		outPut := OutPut{
+			Title:  fmt.Sprintf("------------------------------> No.%d  Shell on node: %s <------------------------------", i, n),
+			StdOut: bytes.NewBufferString(""),
+			StdErr: bytes.NewBufferString(""),
+		}
+
+		outPuts[i] = outPut
 		if pod != nil {
 			shExecOps := k8stools.ExecOptions{
 				Command:       cmdStr,
 				ContainerName: "",
 				In:            nil,
-				Out:           outPutBuffer,
-				Err:           os.Stderr,
+				Out:           outPut.StdOut,
+				Err:           outPut.StdErr,
 				Istty:         false,
 				TimeOut:       httpTimeOutInSec,
 			}
 			go execCmdParallel(kubeClientSet, kubeClientConfig, pod, shExecOps, tChan)
 			threadNum += 1
 		} else {
-			outPutBuffer.WriteString("Can't find shell pod on " + n + "\n")
+			outPut.StdErr.WriteString("Can't find shell pod on " + n)
 		}
 		i += 1
 		if threadNum == currentThreadNum || total == i {
@@ -55,9 +60,10 @@ func nodeShell(cmd *cobra.Command, args []string) {
 			threadNum = 0
 		}
 	}
-
-	for _, output := range outPutBuffers {
-		fmt.Print(output.String())
+	for _, output := range outPuts {
+		os.Stderr.WriteString(color.HiYellowString(output.Title) + "\n")
+		color.HiGreen(output.StdOut.String())
+		color.HiYellow(output.StdErr.String())
 	}
 }
 
