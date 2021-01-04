@@ -81,13 +81,13 @@ func printOutput(outPuts []OutPut) {
 			color.HiRed(output.StdErr.String())
 			break
 		case "prefix":
-			prefixStr := color.HiYellowString("[%s]", output.NodeName)
+			prefixStr := color.BlueString("[%s]", output.NodeName)
 			for {
 				line, err := output.StdOut.ReadString('\n')
 				if err != nil || io.EOF == err {
 					break
 				}
-				fmt.Printf("%s %s\n", prefixStr, color.HiBlueString(line))
+				fmt.Printf("%s %s", prefixStr, color.HiYellowString(line))
 			}
 			for {
 				line, err := output.StdErr.ReadString('\n')
