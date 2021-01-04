@@ -77,7 +77,7 @@ func printOutput(outPuts []OutPut) {
 		switch format {
 		case "title":
 			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
-			color.HiBlue(output.StdOut.String())
+			color.HiYellow(output.StdOut.String())
 			color.HiRed(output.StdErr.String())
 			break
 		case "prefix":
