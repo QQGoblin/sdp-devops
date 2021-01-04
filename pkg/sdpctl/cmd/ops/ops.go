@@ -1,16 +1,23 @@
 package ops
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	"sdp-devops/pkg/sdpctl/cmd/ops/shell_tool"
 )
 
 func NewCmdOps() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "ops",
-		Short:                 "管理SDP相关依赖",
+		Short:                 "SDP相关依赖工具",
 		DisableFlagsInUseLine: true,
+		Run:                   runHelp,
 	}
-	cmd.AddCommand(shell_tool.NewCmdShellTool())
 	return cmd
+}
+
+func runHelp(cmd *cobra.Command, args []string) {
+	fmt.Println("#############################################################")
+	fmt.Println("#                        部署辅助工具                        #")
+	fmt.Println("#############################################################")
+	fmt.Println("kubectl apply -f http://goblin.lqingcloud.cn:9000/cicd/yaml/node-shell.yml")
 }
