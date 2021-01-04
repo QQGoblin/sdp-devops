@@ -76,12 +76,12 @@ func printOutput(outPuts []OutPut) {
 	for i, output := range outPuts {
 		switch format {
 		case "raw":
-			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
-			color.HiYellow(output.StdOut.String())
+			color.Blue("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
+			fmt.Printf(output.StdOut.String())
 			color.HiRed(output.StdErr.String())
 			break
 		case "prefix":
-			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
+			color.Blue("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
 			prefixStr := color.BlueString("[%s]", output.NodeName)
 			for {
 				line, err := output.StdOut.ReadString('\n')
@@ -95,7 +95,7 @@ func printOutput(outPuts []OutPut) {
 				if err != nil || io.EOF == err {
 					break
 				}
-				fmt.Printf("%s %s", prefixStr, color.HiRedString(line))
+				fmt.Printf("%s %s", prefixStr, line)
 			}
 			break
 		default:
