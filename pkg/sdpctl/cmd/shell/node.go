@@ -73,7 +73,7 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 }
 
 func printOutput(outPuts []OutPut) {
-	for _, output := range outPuts {
+	for i, output := range outPuts {
 		switch format {
 		case "title":
 			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
