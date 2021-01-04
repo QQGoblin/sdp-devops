@@ -94,7 +94,7 @@ func printOutput(outPuts []OutPut) {
 				if err != nil || io.EOF == err {
 					break
 				}
-				fmt.Printf("%s %s\n", prefixStr, color.HiRedString(line))
+				fmt.Printf("%s %s", prefixStr, color.HiRedString(line))
 			}
 			break
 		default:
