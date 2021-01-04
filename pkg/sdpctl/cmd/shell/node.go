@@ -88,7 +88,7 @@ func printOutput(outPuts []OutPut) {
 				if err != nil || io.EOF == err {
 					break
 				}
-				fmt.Printf("%s %s", prefixStr, color.HiYellowString(line))
+				fmt.Printf("%s %s", prefixStr, line)
 			}
 			for {
 				line, err := output.StdErr.ReadString('\n')
