@@ -43,17 +43,17 @@ func install(cmd *cobra.Command, args []string) {
 		ObjectMeta: metav1.ObjectMeta{Name: config.ShellToolName},
 	}
 
-	if ns, err := kubeClientSet.CoreV1().Namespaces().Get(config.ShellToolName, metav1.GetOptions{}); err != nil {
-		logrus.Error("Kube API 异常")
-		panic(err.Error())
-	} else if ns == nil {
+	var ns *v1.Namespace
+	var err error
+	ns, err = kubeClientSet.CoreV1().Namespaces().Get(config.ShellToolName, metav1.GetOptions{})
+	if ns == nil || err != nil {
 		if _, err := kubeClientSet.CoreV1().Namespaces().Create(&shellNS); err != nil {
 			logrus.Error("创建命名空间", config.ShellToolName, "失败")
 			panic(err.Error())
 		}
 	}
 
-	if _, err := kubeClientSet.AppsV1().DaemonSets(config.ShellToolName).Get(config.ShellToolName, metav1.GetOptions{
+	if _, err = kubeClientSet.AppsV1().DaemonSets(config.ShellToolName).Get(config.ShellToolName, metav1.GetOptions{
 		TypeMeta:        metav1.TypeMeta{},
 		ResourceVersion: "",
 	}); err == nil {
@@ -121,7 +121,7 @@ func install(cmd *cobra.Command, args []string) {
 			},
 		},
 	}
-	if _, err := kubeClientSet.AppsV1().DaemonSets(config.ShellToolName).Create(&nodeShellDSDefine); err != nil {
+	if _, err = kubeClientSet.AppsV1().DaemonSets(config.ShellToolName).Create(&nodeShellDSDefine); err != nil {
 		logrus.Error("创建DaemonSet", nodeShellDSDefine.Name, "失败")
 		panic(err.Error())
 	}
