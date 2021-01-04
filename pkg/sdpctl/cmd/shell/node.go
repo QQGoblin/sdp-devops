@@ -61,9 +61,9 @@ func nodeShell(cmd *cobra.Command, args []string) {
 		}
 	}
 	for _, output := range outPuts {
-		os.Stderr.WriteString(color.HiYellowString(output.Title) + "\n")
-		color.HiGreen(output.StdOut.String())
-		color.HiYellow(output.StdErr.String())
+		os.Stderr.WriteString(color.HiGreenString(output.Title) + "\n")
+		color.HiYellow(output.StdOut.String())
+		color.HiRed(output.StdErr.String())
 	}
 }
 
