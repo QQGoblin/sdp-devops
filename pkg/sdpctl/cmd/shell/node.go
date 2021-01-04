@@ -6,10 +6,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"io"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
-	"os"
 	"sdp-devops/pkg/sdpctl/config"
 	"sdp-devops/pkg/sdpctl/sdpk8s"
 	k8stools "sdp-devops/pkg/util/kubernetes"
@@ -33,9 +33,9 @@ func nodeShell(cmd *cobra.Command, args []string) {
 
 	for n, pod := range shellPodTargets {
 		outPut := OutPut{
-			Title:  fmt.Sprintf("------------------------------> No.%d  Shell on node: %s <------------------------------", i, n),
-			StdOut: bytes.NewBufferString(""),
-			StdErr: bytes.NewBufferString(""),
+			NodeName: n,
+			StdOut:   bytes.NewBufferString(""),
+			StdErr:   bytes.NewBufferString(""),
 		}
 
 		outPuts[i] = outPut
@@ -60,11 +60,7 @@ func nodeShell(cmd *cobra.Command, args []string) {
 			threadNum = 0
 		}
 	}
-	for _, output := range outPuts {
-		os.Stderr.WriteString(color.HiGreenString(output.Title) + "\n")
-		color.HiYellow(output.StdOut.String())
-		color.HiRed(output.StdErr.String())
-	}
+	printOutput(outPuts)
 }
 
 func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *restclient.Config, pod *v1.Pod, execOptions k8stools.ExecOptions, tChan chan int) {
@@ -74,4 +70,37 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 		//panic(err.Error())
 	}
 	tChan <- 1
+}
+
+func printOutput(outPuts []OutPut) {
+	for _, output := range outPuts {
+		switch format {
+		case "title":
+			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
+			color.HiBlue(output.StdOut.String())
+			color.HiRed(output.StdErr.String())
+			break
+		case "prefix":
+			prefixStr := color.HiYellowString("[%s]", output.NodeName)
+			for {
+				line, err := output.StdOut.ReadString('\n')
+				if err != nil || io.EOF == err {
+					break
+				}
+				fmt.Printf("%s %s\n", prefixStr, color.HiBlueString(line))
+			}
+			for {
+				line, err := output.StdErr.ReadString('\n')
+				if err != nil || io.EOF == err {
+					break
+				}
+				fmt.Printf("%s %s\n", prefixStr, color.HiRedString(line))
+			}
+			break
+		default:
+			logrus.Error("不支持该格式输出")
+
+		}
+
+	}
 }
