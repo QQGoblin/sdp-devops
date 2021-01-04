@@ -75,12 +75,13 @@ func execCmdParallel(kubeClientSet *kubernetes.Clientset, kubeClientConfig *rest
 func printOutput(outPuts []OutPut) {
 	for i, output := range outPuts {
 		switch format {
-		case "title":
+		case "raw":
 			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
 			color.HiYellow(output.StdOut.String())
 			color.HiRed(output.StdErr.String())
 			break
 		case "prefix":
+			color.HiGreen("------------------------------> No.%d  Shell on node: %s <------------------------------", i, output.NodeName)
 			prefixStr := color.BlueString("[%s]", output.NodeName)
 			for {
 				line, err := output.StdOut.ReadString('\n')
