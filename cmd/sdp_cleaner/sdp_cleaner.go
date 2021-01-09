@@ -4,11 +4,11 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"sdp-devops/pkg/cleaner"
-	sdpLogger "sdp-devops/pkg/logger"
+	"sdp-devops/pkg/util"
 )
 
 func main() {
-	sdpLogger.InitLogger()
+	util.InitLogger()
 	command := NewCleanerCommand()
 	if err := command.Execute(); err != nil {
 		os.Exit(1)

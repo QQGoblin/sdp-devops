@@ -5,11 +5,11 @@ import (
 	"os"
 	"sdp-devops/pkg/exporter"
 	"sdp-devops/pkg/exporter/config"
-	sdpLogger "sdp-devops/pkg/logger"
+	"sdp-devops/pkg/util"
 )
 
 func main() {
-	sdpLogger.InitLogger()
+	util.InitLogger()
 	command := NewExporterCommand()
 	if err := command.Execute(); err != nil {
 		os.Exit(1)

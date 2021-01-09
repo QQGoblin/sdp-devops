@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
-	"sdp-devops/pkg/util/goblin"
+	"sdp-devops/pkg/util"
 	"strings"
 	"time"
 )
@@ -66,7 +66,7 @@ func cleanDir(dirpath string) bool {
 				continue
 			}
 			if file.Size() > logSizeLimit && logFileExt.Contains(fileExt) {
-				logrus.Infof("文件超出大小限制，清除数据：%s (%s) ", path.Join(dirpath, file.Name()), goblin.FormatByte(file.Size()))
+				logrus.Infof("文件超出大小限制，清除数据：%s (%s) ", path.Join(dirpath, file.Name()), util.FormatByte(file.Size()))
 				echo(path.Join(dirpath, file.Name()))
 				continue
 			}
@@ -144,7 +144,7 @@ func cleanContainerStdLog() {
 			for _, file := range files {
 				if strings.EqualFold(file.Name(), c.Name()+"-json.log") && file.Size() > logSizeLimit {
 					stdLogPath := path.Join(containerBase, c.Name(), file.Name())
-					logrus.Errorf("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, goblin.FormatByte(file.Size()))
+					logrus.Errorf("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, util.FormatByte(file.Size()))
 					echo(stdLogPath)
 					break
 				}

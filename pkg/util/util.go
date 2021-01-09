@@ -1,10 +1,49 @@
-package goblin
+package util
 
 import (
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path"
 	"strconv"
 )
 
+// 初始化日志文件
+func InitLogger() {
+	logrus.SetOutput(os.Stdout)
+	//logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.InfoLevel)
+	logrus.WithFields(logrus.Fields{
+		"sdp-devops": "Kubernetes",
+	})
+
+}
+
+// 计算目录的大小
+func CalDirSize(dirpath string) (dirsize int64, err error) {
+	err = os.Chdir(dirpath)
+	if err != nil {
+		return
+	}
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		dirsize += file.Size()
+		if file.Mode().IsDir() {
+			subDirSize, err2 := CalDirSize(path.Join(dirpath, file.Name()))
+			if err2 == nil {
+				dirsize += subDirSize
+			}
+		}
+	}
+	return
+}
+
+// 格式化字节单位到字符串
 var (
 	KB int64 = 1024
 	MB       = KB * 1024
@@ -12,7 +51,6 @@ var (
 	TB       = GB * 1024
 )
 
-// 格式字节单位到字符串
 func FormatByte(b int64) string {
 
 	if b >= TB {
@@ -31,6 +69,7 @@ func FormatByte(b int64) string {
 	return strconv.FormatFloat(float64(b), 'f', 2, 64)
 }
 
+// 格式化百分比字符串
 func FormatPercentage(usage int64, total int64) string {
 	percentage := float64(usage) / float64(total)
 	var colorStr string
