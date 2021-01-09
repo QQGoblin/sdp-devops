@@ -8,8 +8,8 @@ import (
 	"path"
 	"sdp-devops/pkg/exporter/config"
 	dockertools "sdp-devops/pkg/util/docker"
+	"sdp-devops/pkg/util/goblin"
 	k8stools "sdp-devops/pkg/util/kubernetes"
-	systools "sdp-devops/pkg/util/sys"
 	"strings"
 )
 
@@ -82,7 +82,7 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 		_, isExist := os.Stat(tomcatLogDirPath)
 		var tomcatLogSize int64
 		if isExist == nil {
-			tomcatLogSize, _ = systools.CalDirSize(tomcatLogDirPath)
+			tomcatLogSize, _ = goblin.CalDirSize(tomcatLogDirPath)
 		}
 		ch <- prometheus.MustNewConstMetric(c.containerSize, prometheus.GaugeValue, float64(containerSize), pod.Name, pod.Namespace, nodename)
 		ch <- prometheus.MustNewConstMetric(c.logSize, prometheus.GaugeValue, float64(dockerLogSize), pod.Name, pod.Namespace, nodename)

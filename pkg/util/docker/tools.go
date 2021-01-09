@@ -5,7 +5,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/sirupsen/logrus"
 	"path"
-	"sdp-devops/pkg/util/sys"
+	"sdp-devops/pkg/util/goblin"
 	"strings"
 )
 
@@ -39,7 +39,7 @@ func ContainerSize(containerID string, cli *client.Client) int64 {
 	}
 	upperDir := containerInfo.GraphDriver.Data["UpperDir"]
 	// TODO: 这里改成系统调用会不会更快？
-	upperDirSize, _ := sys.CalDirSize(upperDir)
+	upperDirSize, _ := goblin.CalDirSize(upperDir)
 	return upperDirSize
 }
 
@@ -47,6 +47,6 @@ func ContainerSize(containerID string, cli *client.Client) int64 {
 func ContainerLogSize(containerID, dockerRootDir string, cli *client.Client) int64 {
 
 	containerDataPath := path.Join(dockerRootDir, "containers", containerID)
-	logSize, _ := sys.CalDirSize(containerDataPath)
+	logSize, _ := goblin.CalDirSize(containerDataPath)
 	return logSize
 }

@@ -1,4 +1,4 @@
-package metrics
+package goblin
 
 import (
 	"github.com/fatih/color"

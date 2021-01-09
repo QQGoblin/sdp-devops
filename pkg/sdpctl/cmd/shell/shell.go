@@ -15,7 +15,7 @@ func NewCmdSh() *cobra.Command {
 			case "k8s-node":
 				nodeShell(cmd, args)
 				break
-			case "docker-net":
+			case "container-net":
 				dockerNet(cmd, args)
 				break
 			default:

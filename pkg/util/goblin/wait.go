@@ -1,4 +1,4 @@
-package sys
+package goblin
 
 import (
 	"github.com/sirupsen/logrus"

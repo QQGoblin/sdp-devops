@@ -10,10 +10,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	metricsv1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
 	"sdp-devops/pkg/sdpctl/config"
-	"sdp-devops/pkg/sdpctl/sdpk8s"
+	"sdp-devops/pkg/util/goblin"
 	k8stools "sdp-devops/pkg/util/kubernetes"
-	metricstools "sdp-devops/pkg/util/metrics"
-	"sdp-devops/pkg/util/table"
 	"sort"
 	"strconv"
 	"strings"
@@ -63,7 +61,7 @@ func nodeUsage() map[string]metricsv1beta1.NodeMetrics {
 
 func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, nodeMetricsDict map[string]metricsv1beta1.NodeMetrics) {
 
-	nodeInfoList := make([]sdpk8s.NodeBriefInfo, len(nodes.Items))
+	nodeInfoList := make([]NodeBriefInfo, len(nodes.Items))
 	allPodDist, _ := k8stools.GetPodDict(kubeClientSet, "")
 	for i, node := range nodes.Items {
 		// 获取Role以及Label信息
@@ -111,12 +109,12 @@ func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, node
 		}
 
 		nodeMetrics := nodeMetricsDict[node.Name]
-		memoryUsageStr := metricstools.FormatByte(nodeMetrics.Usage.Memory().Value())
-		memoryCapacityStr := metricstools.FormatByte(node.Status.Capacity.Memory().Value())
-		memoryRequestStr := metricstools.FormatByte(memoryRequest)
-		memoryLimitsStr := metricstools.FormatByte(memoryLimits)
+		memoryUsageStr := goblin.FormatByte(nodeMetrics.Usage.Memory().Value())
+		memoryCapacityStr := goblin.FormatByte(node.Status.Capacity.Memory().Value())
+		memoryRequestStr := goblin.FormatByte(memoryRequest)
+		memoryLimitsStr := goblin.FormatByte(memoryLimits)
 
-		nodeInfo := sdpk8s.NodeBriefInfo{
+		nodeInfo := NodeBriefInfo{
 			Name:          node.Name,
 			Role:          role,
 			UnSche:        unschedulable,
@@ -125,9 +123,9 @@ func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, node
 			Label:         strings.Join(commonLabel, ","),
 			CPU:           node.Status.Capacity.Cpu().String(),
 			Memory:        memoryCapacityStr,
-			MemoryUsage:   memoryUsageStr + "(" + metricstools.FormatPercentage(nodeMetrics.Usage.Memory().Value(), node.Status.Capacity.Memory().Value()) + ")",
-			MemoryRequest: memoryRequestStr + "(" + metricstools.FormatPercentage(memoryRequest, node.Status.Capacity.Memory().Value()) + ")",
-			MemoryLimits:  memoryLimitsStr + "(" + metricstools.FormatPercentage(memoryLimits, node.Status.Capacity.Memory().Value()) + ")",
+			MemoryUsage:   memoryUsageStr + "(" + goblin.FormatPercentage(nodeMetrics.Usage.Memory().Value(), node.Status.Capacity.Memory().Value()) + ")",
+			MemoryRequest: memoryRequestStr + "(" + goblin.FormatPercentage(memoryRequest, node.Status.Capacity.Memory().Value()) + ")",
+			MemoryLimits:  memoryLimitsStr + "(" + goblin.FormatPercentage(memoryLimits, node.Status.Capacity.Memory().Value()) + ")",
 			Pod:           strconv.Itoa(len(podListOnNode)) + "/" + node.Status.Capacity.Pods().String(),
 		}
 
@@ -142,5 +140,5 @@ func nodeBriefInfo(kubeClientSet *kubernetes.Clientset, nodes *v1.NodeList, node
 	sort.Slice(nodeInfoList, func(i, j int) bool {
 		return nodeInfoList[i].Role < nodeInfoList[j].Role
 	})
-	table.Output(nodeInfoList)
+	goblin.Output(nodeInfoList)
 }

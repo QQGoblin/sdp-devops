@@ -3,7 +3,7 @@ package cleaner
 import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/spf13/pflag"
-	unit "sdp-devops/pkg/util/metrics"
+	"sdp-devops/pkg/util/goblin"
 )
 
 var (
@@ -36,7 +36,7 @@ func AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&tomcatLogDir, "tomcat-log-dir", "/data/container_logs", "tomcat日志的根目录。")
 	flags.StringVar(&dockerBase, "container-base", "/data/var/lib/docker", "Docker服务的根目录。")
 	flags.IntVar(&logEditTimeLimit, "last-edit-time", 30, "最晚文件编辑时间。")
-	flags.Int64Var(&logSizeLimit, "max-size", 1*unit.GB, "最晚文件编辑时间。")
+	flags.Int64Var(&logSizeLimit, "max-size", 1*goblin.GB, "最晚文件编辑时间。")
 	flags.BoolVar(&isServer, "server", false, "启动定时清理服务。")
 	flags.StringVar(&cronStr, "cron", "0 * * * *", "定时清理crontab配置。")
 }
