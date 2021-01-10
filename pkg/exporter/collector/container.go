@@ -52,6 +52,7 @@ func NewContainerCollector() (Collector, error) {
 }
 
 // 实现采集接口
+// TODO: 去除docker相关依赖
 func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 	k8scli, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 	dockercli := dockertools.DockerClient("")
@@ -84,6 +85,7 @@ func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
 		if isExist == nil {
 			tomcatLogSize, _ = util.CalDirSize(tomcatLogDirPath)
 		}
+		//TODO: dockerLogSize 后续可不监控
 		ch <- prometheus.MustNewConstMetric(c.containerSize, prometheus.GaugeValue, float64(containerSize), pod.Name, pod.Namespace, nodename)
 		ch <- prometheus.MustNewConstMetric(c.logSize, prometheus.GaugeValue, float64(dockerLogSize), pod.Name, pod.Namespace, nodename)
 		ch <- prometheus.MustNewConstMetric(c.userLogSize, prometheus.GaugeValue, float64(tomcatLogSize), pod.Name, pod.Namespace, nodename)

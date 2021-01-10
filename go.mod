@@ -11,6 +11,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/fatih/color v1.10.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.8.0
 	github.com/prometheus/common v0.15.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
@@ -25,9 +26,11 @@ require (
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b // indirect
 	golang.org/x/sys v0.0.0-20210104204734-6f8348627aad // indirect
 	golang.org/x/text v0.3.4 // indirect
+	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0 // indirect
 	k8s.io/api v0.16.15
 	k8s.io/apimachinery v0.16.15
 	k8s.io/client-go v0.16.15
+	k8s.io/cri-api v0.16.15
 	k8s.io/metrics v0.16.15
 )
