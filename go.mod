@@ -33,4 +33,6 @@ require (
 	k8s.io/client-go v0.16.15
 	k8s.io/cri-api v0.16.15
 	k8s.io/metrics v0.16.15
+	github.com/emicklei/go-restful/v3 v3.4.0
+	github.com/go-resty/resty/v2 v2.4.0
 )

@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"sdp-devops/pkg/alert"
+	"sdp-devops/pkg/alert/config"
 	"sdp-devops/pkg/util"
 )
 
@@ -24,6 +25,6 @@ func NewAlertServerCommand() *cobra.Command {
 		},
 	}
 	flags := rootCmd.PersistentFlags()
-	alert.AddFlags(flags)
+	config.AddFalconFlags(flags)
 	return rootCmd
 }
