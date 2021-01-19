@@ -16,7 +16,6 @@ spec:
         - name: sdp-alert
           image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
           command: ["/bin/sdp-alert"]
-          args:  [ "--falcon-notify-numbers", "xxxxxx","--falcon-server","alarm-assist.falcon.in.sdp:6063"]
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
@@ -35,3 +34,31 @@ spec:
       port: 8080
   selector:
     name: sdp-alert
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sdp-alert
+  namespace: sdp-devops
+  labels:
+    name: sdp-alert
+data:
+  sdp-alert.conf: |
+    port: 8080
+    alertNameMap:
+      HighErrorRate: "磁盘空间不足"
+    areaNameMap:
+      CL: "长乐环境"
+      AWSCA: "AWS 加利福尼亚环境"
+      AWSBH: "AWS 巴林环境"
+      HK:    "香港环境"
+      WX:    "无锡生产环境"
+      WXPRE: "无锡预生产环境"
+      VOD:   "VOD演练环境"
+      EGPRE: "VOD埃及预生产环境"
+    falcon:
+      server: "alarm.falcon.cl.sdp:6063"
+      token: "c119a423a2c05da9703a76ab57fa4570f0fa655951da2"
+      numbers:
+      - 15860837730
+

@@ -25,6 +25,6 @@ func NewAlertServerCommand() *cobra.Command {
 		},
 	}
 	flags := rootCmd.PersistentFlags()
-	config.AddFalconFlags(flags)
+	config.AddFlags(flags)
 	return rootCmd
 }

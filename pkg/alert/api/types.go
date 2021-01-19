@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"sdp-devops/pkg/alert/config"
+)
 
 type AnnotationsMsg struct {
 	Description string `json:"description"`
@@ -29,27 +32,10 @@ type Notify struct {
 	GroupKey          string            `json:"groupKey"`
 }
 
-var (
-	AreaNameMap = map[string]string{
-		"CL":    "长乐环境",
-		"AWSCA": "AWS 加利福尼亚环境",
-		"AWSBH": "AWS 巴林环境",
-		"HK":    "香港环境",
-		"WX":    "无锡生产环境",
-		"WXPRE": "无锡预生产环境",
-		"VOD":   "VOD演练环境",
-		"EGPRE": "VOD埃及预生产环境",
-	}
-
-	AlertNameMap = map[string]string{
-		"HighErrorRate": "磁盘空间不足",
-	}
-)
-
 func (u Notify) AlertNotifyMsg() string {
 
-	areaName := AreaNameMap[u.CommonLabels["AREA"]]
-	alertname := AlertNameMap[u.CommonLabels["alertname"]]
+	areaName := config.GlobalAlertConfig.AreaNameMap[u.CommonLabels["AREA"]]
+	alertname := config.GlobalAlertConfig.AlertNameMap[u.CommonLabels["alertname"]]
 	msg := fmt.Sprintf("告警：%s %s ，请关注", areaName, alertname)
 	return msg
 }

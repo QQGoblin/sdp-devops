@@ -36,11 +36,11 @@ func alertFalcon(request *restful.Request, response *restful.Response) {
 		SetBody(FalconPhoneAlert{
 			Type:      "phone",
 			Content:   alertNotify.AlertNotifyMsg(),
-			Recievers: config.FalconNotifyNumbers,
+			Recievers: config.GlobalAlertConfig.Falcon.Numbers,
 		}).
 		SetHeader("Content-Type", "application/json").
-		SetHeader("Api-Token", config.FalconAPIToken).
-		Post("http://" + config.FalconServer + "/v1/api/alarms")
+		SetHeader("Api-Token", config.GlobalAlertConfig.Falcon.Token).
+		Post("http://" + config.GlobalAlertConfig.Falcon.Server + "/v1/api/alarms")
 
 	if err != nil {
 		response.WriteErrorString(http.StatusBadRequest, errors.Wrap(err, "发送Falcon电话告警失败").Error())
