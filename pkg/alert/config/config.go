@@ -14,7 +14,8 @@ var (
 )
 
 func AddFlags(flags *pflag.FlagSet) {
-	flags.StringVar(&ConfigPath, "config", "/etc/sdp-alert.conf", "配置文件地址")
+	flags.StringVar(&ConfigPath, "config", "/etc/sdp/alert.conf", "配置文件地址")
+	LoadConfig()
 }
 
 func LoadConfig() {

@@ -19,6 +19,17 @@ spec:
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
+          volumeMounts:
+          - name: config
+            mountPath: /etc/sdp
+            subPath: alert.conf
+      volumes:
+        - name: config
+          configMap:
+            items:
+              - key: sdp-alert
+                path: alert.conf
+
 ---
 apiVersion: v1
 kind: Service
@@ -43,7 +54,7 @@ metadata:
   labels:
     name: sdp-alert
 data:
-  sdp-alert.conf: |
+  alert.conf: |
     port: 8080
     alertNameMap:
       HighErrorRate: "磁盘空间不足"
