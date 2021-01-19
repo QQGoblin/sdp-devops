@@ -58,7 +58,7 @@ func cleanDir(dirpath string) bool {
 	for _, file := range files {
 		if file.Mode().IsRegular() {
 			fileExt := path.Ext(file.Name())
-			if file.ModTime().Before(lastEditTime) && (isTimeExt(fileExt) || deleteFileExt.Contains(fileExt)) {
+			if file.ModTime().Before(lastEditTime) && isDeleteFiles(file.Name()) {
 				logrus.Infof("超出编辑时间限制，删除文件：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
 				if err = os.Remove(path.Join(dirpath, file.Name())); err != nil {
 					logrus.Errorf("删除文件失败：%s (%s)", file.Name(), err.Error())
@@ -89,15 +89,20 @@ func cleanDir(dirpath string) bool {
 判断字符串是否符合正则表达试：
 
 */
-func isTimeExt(s string) bool {
+func isDeleteFiles(fname string) bool {
 
-	if strings.EqualFold(s, "") {
-		// 文件没有后缀
-		return false
+	fext := fname
+	if indx := strings.Index(fname, "."); indx >= 0 {
+		fext = fname[indx:]
 	}
+
+	if deleteFileExt.Contains(fext) {
+		return true
+	}
+
 	isMatch := false
 	for _, p := range regFileExt {
-		isMatch, _ = regexp.MatchString(p, s)
+		isMatch, _ = regexp.MatchString(p, fext)
 		if isMatch {
 			break
 		}
@@ -144,7 +149,7 @@ func cleanContainerStdLog() {
 			for _, file := range files {
 				if strings.EqualFold(file.Name(), c.Name()+"-json.log") && file.Size() > logSizeLimit {
 					stdLogPath := path.Join(containerBase, c.Name(), file.Name())
-					logrus.Errorf("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, util.FormatByte(file.Size()))
+					logrus.Infof("文件超出大小限制，清除数据：%s (%s) ", stdLogPath, util.FormatByte(file.Size()))
 					echo(stdLogPath)
 					break
 				}
