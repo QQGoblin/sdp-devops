@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sdp-alert
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.4-beta
           command: ["/bin/sdp-alert"]
           ports:
             - containerPort: 8080

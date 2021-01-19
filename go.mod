@@ -9,7 +9,9 @@ require (
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/emicklei/go-restful/v3 v3.4.0
 	github.com/fatih/color v1.10.0
+	github.com/go-resty/resty/v2 v2.4.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.8.0
@@ -28,11 +30,10 @@ require (
 	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/yaml.v2 v2.3.0
 	k8s.io/api v0.16.15
 	k8s.io/apimachinery v0.16.15
 	k8s.io/client-go v0.16.15
 	k8s.io/cri-api v0.16.15
 	k8s.io/metrics v0.16.15
-	github.com/emicklei/go-restful/v3 v3.4.0
-	github.com/go-resty/resty/v2 v2.4.0
 )
