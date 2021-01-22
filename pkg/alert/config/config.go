@@ -15,7 +15,6 @@ var (
 
 func AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&ConfigPath, "config", "/etc/sdp/alert.conf", "配置文件地址")
-	LoadConfig()
 }
 
 func LoadConfig() {
@@ -25,7 +24,7 @@ func LoadConfig() {
 		panic(err)
 	}
 
-	err = yaml.Unmarshal(yamlFile, GlobalAlertConfig)
+	err = yaml.Unmarshal(yamlFile, &GlobalAlertConfig)
 
 	if err != nil {
 		logrus.Error(errors.Wrapf(err, "配置文件格式异常：%s", ConfigPath))

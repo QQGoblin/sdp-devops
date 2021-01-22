@@ -10,6 +10,7 @@ import (
 
 func Main() {
 
+	config.LoadConfig()
 	restful.DefaultContainer.Add(api.WebService())
 	logrus.Printf("start listening on 0.0.0.0:%s", config.GlobalAlertConfig.Port)
 	logrus.Fatal(http.ListenAndServe("0.0.0.0:"+config.GlobalAlertConfig.Port, nil))
