@@ -28,7 +28,7 @@ spec:
           configMap:
             name: sdp-alert
             items:
-              - key: sdp-alert
+              - key: alert.conf
                 path: alert.conf
 
 ---
