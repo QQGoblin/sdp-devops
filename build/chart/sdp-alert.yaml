@@ -22,7 +22,6 @@ spec:
           volumeMounts:
           - name: config
             mountPath: /etc/sdp
-            subPath: alert.conf
       volumes:
         - name: config
           configMap:
