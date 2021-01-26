@@ -32,6 +32,8 @@ var (
 		"^\\.log\\.\\d+$", // a.log.123
 		"^\\.out\\.\\d+$", // a.out.123
 		"^\\.gz\\.\\d+$",  // a.gz.123
+		"\\.log$",         // a.xxxx.log
+		"\\.out$",         // a.xxxx.out
 	}
 )
 

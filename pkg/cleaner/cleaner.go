@@ -58,7 +58,7 @@ func cleanDir(dirpath string) bool {
 	for _, file := range files {
 		if file.Mode().IsRegular() {
 			fileExt := path.Ext(file.Name())
-			if file.ModTime().Before(lastEditTime) && isDeleteFiles(file.Name()) {
+			if file.ModTime().Before(lastEditTime) && IsDeleteFiles(file.Name()) {
 				logrus.Infof("超出编辑时间限制，删除文件：%s (%s) ", path.Join(dirpath, file.Name()), file.ModTime())
 				if err = os.Remove(path.Join(dirpath, file.Name())); err != nil {
 					logrus.Errorf("删除文件失败：%s (%s)", file.Name(), err.Error())
@@ -89,7 +89,7 @@ func cleanDir(dirpath string) bool {
 判断字符串是否符合正则表达试：
 
 */
-func isDeleteFiles(fname string) bool {
+func IsDeleteFiles(fname string) bool {
 
 	fext := fname
 	if indx := strings.Index(fname, "."); indx >= 0 {
