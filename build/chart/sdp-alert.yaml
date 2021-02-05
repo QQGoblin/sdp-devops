@@ -20,8 +20,8 @@ spec:
             - containerPort: 8080
           imagePullPolicy: Always
           volumeMounts:
-          - name: config
-            mountPath: /etc/sdp
+            - name: config
+              mountPath: /etc/sdp
       volumes:
         - name: config
           configMap:
@@ -72,4 +72,9 @@ data:
       token: "c119a423a2c05da9703a76ab57fa4570f0fa655951da2"
       numbers:
       - 15860837730
+    wxWorkConfig:
+      corpId: ""
+      corpSecret: ""
+      agentId: 1
+      toParty: ""
 

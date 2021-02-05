@@ -2,34 +2,44 @@ package api
 
 import (
 	"encoding/json"
-	restful "github.com/emicklei/go-restful/v3"
+	"github.com/emicklei/go-restful/v3"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"sdp-devops/pkg/alert/config"
+	"sdp-devops/pkg/util/wxwork"
 )
+
+var wxWorkClient *wxwork.WXWorkClient
 
 func WebService() *restful.WebService {
 	ws := new(restful.WebService)
 
 	ws.Path("/v1/alert").Consumes(restful.MIME_XML, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_XML)
 	ws.Route(ws.POST("/falcon").To(alertFalcon))
-	ws.Route(ws.POST("/wx").To(alertFalcon))
+	ws.Route(ws.POST("/wx").To(alertWX))
 
 	return ws
 }
 
-func alertFalcon(request *restful.Request, response *restful.Response) {
-
-	var alertNotify Notify
-	if err := request.ReadEntity(&alertNotify); err != nil {
+func parseAlertNotify(request *restful.Request, response *restful.Response) *Notify {
+	var alertNotify *Notify
+	if err := request.ReadEntity(alertNotify); err != nil {
 		response.WriteErrorString(http.StatusBadRequest, errors.Wrap(err, "读取告警信息失败").Error())
-		return
+		return nil
 	}
 	alertNotifyRaw, _ := json.Marshal(alertNotify)
 	logrus.Infof("Alerting 告警信息：%s", string(alertNotifyRaw))
+	return alertNotify
+}
 
+func alertFalcon(request *restful.Request, response *restful.Response) {
+
+	alertNotify := parseAlertNotify(request, response)
+	if alertNotify == nil {
+		return
+	}
 	// 通过Falcon 发送电话告警
 	client := resty.New()
 	resp, err := client.R().
@@ -52,5 +62,24 @@ func alertFalcon(request *restful.Request, response *restful.Response) {
 }
 
 func alertWX(request *restful.Request, response *restful.Response) {
-	// TODO：发送微信告警信息
+
+	alertNotify := parseAlertNotify(request, response)
+	if alertNotify == nil {
+		return
+	}
+	// 发送微信告警信息
+	if wxWorkClient == nil {
+		wxWorkClient = wxwork.New(config.GlobalAlertConfig.WXWork.CorpId, config.GlobalAlertConfig.WXWork.CorpSecret)
+	}
+
+	textCradMsg := wxwork.TextCardMsg{
+		Title:       "SDP 异常告警",
+		Description: alertNotify.AlertNotifyMsg(),
+		Url:         "http://grafana.k8s.101.com",
+	}
+	wxWorkClient.SendMsg(
+		config.GlobalAlertConfig.WXWork.AgentId,
+		config.GlobalAlertConfig.WXWork.ToParty,
+		textCradMsg,
+	)
 }
