@@ -30,5 +30,4 @@ func LoadConfig() {
 		logrus.Error(errors.Wrapf(err, "配置文件格式异常：%s", ConfigPath))
 		panic(err)
 	}
-	logrus.Infof("读取配置配置文件信息：%s", GlobalAlertConfig)
 }

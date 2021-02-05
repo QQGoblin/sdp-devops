@@ -16,10 +16,9 @@ var wxWorkClient *wxwork.WXWorkClient
 func WebService() *restful.WebService {
 	ws := new(restful.WebService)
 
-	ws.Path("/v1/alert").Consumes(restful.MIME_XML, restful.MIME_JSON).Produces(restful.MIME_JSON, restful.MIME_XML)
-	ws.Route(ws.POST("/falcon").To(alertFalcon))
+	ws.Path("/v1/alert")
+	ws.Route(ws.POST("/falcon").To(alertFalcon).Consumes())
 	ws.Route(ws.POST("/wx").To(alertWX))
-
 	return ws
 }
 

@@ -1,7 +1,7 @@
 package alert
 
 import (
-	restful "github.com/emicklei/go-restful/v3"
+	"github.com/emicklei/go-restful/v3"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"sdp-devops/pkg/alert/api"
