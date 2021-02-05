@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
+	"sync"
 	"time"
 )
 
@@ -27,9 +28,9 @@ func New(corpId, corpsecret string) (t *WXWorkClient) {
 		CorpId:     corpId,
 		CorpSecret: corpsecret,
 	}
-
-	wxWorkClient.token.setGetTokenFunc(wxWorkClient.getTokenFunc)
-	wxWorkClient.token.tokenRefresher(context.Background())
+	wxWorkClient.token.mutex = &sync.RWMutex{}
+	wxWorkClient.token.setGetTokenFunc(wxWorkClient.getToken)
+	go wxWorkClient.token.tokenRefresher(context.Background())
 
 	return &wxWorkClient
 

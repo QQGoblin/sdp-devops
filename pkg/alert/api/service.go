@@ -23,14 +23,14 @@ func WebService() *restful.WebService {
 }
 
 func parseAlertNotify(request *restful.Request, response *restful.Response) *Notify {
-	var alertNotify *Notify
-	if err := request.ReadEntity(alertNotify); err != nil {
+	var alertNotify Notify
+	if err := request.ReadEntity(&alertNotify); err != nil {
 		response.WriteErrorString(http.StatusBadRequest, errors.Wrap(err, "读取告警信息失败").Error())
 		return nil
 	}
 	alertNotifyRaw, _ := json.Marshal(alertNotify)
 	logrus.Infof("Alerting 告警信息：%s", string(alertNotifyRaw))
-	return alertNotify
+	return &alertNotify
 }
 
 func alertFalcon(request *restful.Request, response *restful.Response) {

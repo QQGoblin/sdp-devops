@@ -53,7 +53,6 @@ func (t *token) syncToken() error {
 	// 加锁，禁止Client同步时获取Token
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
-
 	t.token = get.token
 	t.expiresIn = get.expiresIn * time.Second
 	t.lastRefresh = time.Now()
