@@ -39,7 +39,6 @@ func New(corpId, corpsecret string) (t *WXWorkClient) {
 
 func (t *WXWorkClient) getToken() (tokenInfo, error) {
 
-	logrus.Info("获取Token信息")
 	tinfo := tokenInfo{}
 	client := resty.New()
 	var rbody GetTokenResp

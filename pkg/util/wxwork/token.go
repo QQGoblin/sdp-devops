@@ -54,7 +54,7 @@ func (t *token) syncToken() error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	t.token = get.token
-	t.expiresIn = get.expiresIn * time.Second
+	t.expiresIn = get.expiresIn
 	t.lastRefresh = time.Now()
 	return nil
 }
@@ -64,7 +64,7 @@ func (t *token) syncToken() error {
 func (t *token) tokenRefresher(ctx context.Context) {
 	const refreshTimeWindow = 30 * time.Minute
 	const minRefreshDuration = 5 * time.Second
-
+	logrus.Info("自动刷新Token信息")
 	var waitDuration time.Duration = 0
 	for {
 		select {
