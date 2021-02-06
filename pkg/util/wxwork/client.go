@@ -3,6 +3,7 @@ package wxwork
 import (
 	"context"
 	"github.com/go-resty/resty/v2"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"sync"
 	"time"
@@ -38,8 +39,8 @@ func New(corpId, corpsecret string) (t *WXWorkClient) {
 
 func (t *WXWorkClient) getToken() (tokenInfo, error) {
 
+	logrus.Info("获取Token信息")
 	tinfo := tokenInfo{}
-
 	client := resty.New()
 	var rbody GetTokenResp
 	resp, err := client.R().
@@ -49,9 +50,16 @@ func (t *WXWorkClient) getToken() (tokenInfo, error) {
 		SetResult(&rbody).
 		Get("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&corpsecret={CORPSECRET}")
 
-	if err != nil || resp.StatusCode() != 200 {
+	if err != nil {
+		logrus.Error(errors.Wrapf(err, "获取Token信息失败"))
 		return tinfo, err
 	}
+
+	if resp.StatusCode() != 200 {
+		logrus.Errorf("Token请求返回值异常：%s", resp.String())
+		return tinfo, err
+	}
+
 	tinfo.token = rbody.AccessToken
 	tinfo.expiresIn = time.Duration(rbody.ExpiresIn) * time.Second
 
@@ -88,6 +96,6 @@ func (t *WXWorkClient) SendMsg(agentid int, toparty string, content TextCardMsg)
 		SetPathParam("token", t.token.getToken()).
 		Post("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}")
 	if err != nil {
-		logrus.Error("发送微信告警失败")
+		logrus.Error(errors.Wrapf(err, "发送微信告警失败"))
 	}
 }

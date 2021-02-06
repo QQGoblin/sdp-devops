@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"sdp-devops/pkg/alert/config"
+	"strings"
 )
 
 type AnnotationsMsg struct {
@@ -32,12 +33,21 @@ type Notify struct {
 	GroupKey          string            `json:"groupKey"`
 }
 
-func (u Notify) AlertNotifyMsg() string {
+func (u Notify) Title() string {
 
 	areaName := config.GlobalAlertConfig.AreaNameMap[u.CommonLabels["AREA"]]
 	alertname := config.GlobalAlertConfig.AlertNameMap[u.CommonLabels["alertname"]]
-	msg := fmt.Sprintf("告警：%s %s ，请关注", areaName, alertname)
+	msg := fmt.Sprintf("%s %s", areaName, alertname)
 	return msg
+}
+
+func (u Notify) Summary() string {
+	summary := make([]string, len(u.Alerts))
+	for i, s := range u.Alerts {
+		summary[i] = s.Annotations.Summary
+	}
+
+	return strings.Join(summary, "\n")
 }
 
 type FalconPhoneAlert struct {

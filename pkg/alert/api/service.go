@@ -44,7 +44,7 @@ func alertFalcon(request *restful.Request, response *restful.Response) {
 	resp, err := client.R().
 		SetBody(FalconPhoneAlert{
 			Type:      "phone",
-			Content:   alertNotify.AlertNotifyMsg(),
+			Content:   alertNotify.Title(),
 			Recievers: config.GlobalAlertConfig.Falcon.Numbers,
 		}).
 		SetHeader("Content-Type", "application/json").
@@ -72,8 +72,8 @@ func alertWX(request *restful.Request, response *restful.Response) {
 	}
 
 	textCradMsg := wxwork.TextCardMsg{
-		Title:       "SDP 异常告警",
-		Description: alertNotify.AlertNotifyMsg(),
+		Title:       alertNotify.Title(),
+		Description: alertNotify.Summary(),
 		Url:         "http://grafana.k8s.101.com",
 	}
 	wxWorkClient.SendMsg(
