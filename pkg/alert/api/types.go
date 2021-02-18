@@ -37,7 +37,13 @@ func (u Notify) Title() string {
 
 	areaName := config.GlobalAlertConfig.AreaNameMap[u.CommonLabels["AREA"]]
 	alertname := config.GlobalAlertConfig.AlertNameMap[u.CommonLabels["alertname"]]
-	msg := fmt.Sprintf("%s %s", areaName, alertname)
+	var msg string
+	if strings.EqualFold(u.Status, "resolved") {
+		msg = fmt.Sprintf("%s %s", areaName, "异常恢复")
+	} else {
+		msg = fmt.Sprintf("%s %s", areaName, alertname)
+	}
+
 	return msg
 }
 

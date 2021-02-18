@@ -58,6 +58,7 @@ data:
     port: 8080
     alertNameMap:
       HighErrorRate: "磁盘空间不足"
+      HttpProbeError: "服务拨测异常"
     areaNameMap:
       CL: "长乐环境"
       AWSCA: "AWS 加利福尼亚环境"
