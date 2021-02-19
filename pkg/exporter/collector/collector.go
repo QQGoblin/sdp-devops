@@ -4,6 +4,8 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
+	"net/http"
+	"net/url"
 	"os"
 	"sdp-devops/pkg/exporter/config"
 	"sync"
@@ -34,6 +36,7 @@ const namespace = "sdp"
 // SDPCollector 最上层的采集器
 type SDPCollector struct {
 	Collectors map[string]Collector
+	Params     url.Values
 }
 
 // 实现 prometheus.Collector 的 Describe 接口
@@ -47,18 +50,18 @@ func (n SDPCollector) Collect(ch chan<- prometheus.Metric) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(n.Collectors))
 	for name, c := range n.Collectors {
-		go func(name string, c Collector) {
-			execute(name, c, ch)
+		go func(name string, c Collector, params url.Values) {
+			execute(name, c, ch, params)
 			wg.Done()
-		}(name, c)
+		}(name, c, n.Params)
 	}
 	wg.Wait()
 }
 
 // 上层采集器调用子异步调用子采集器Update接口，更新采集的数据
-func execute(name string, c Collector, ch chan<- prometheus.Metric) {
+func execute(name string, c Collector, ch chan<- prometheus.Metric, params url.Values) {
 	begin := time.Now()
-	err := c.Update(ch)
+	err := c.Update(ch, params)
 	duration := time.Since(begin)
 	var success float64
 	nodename, _ := os.Hostname()
@@ -76,9 +79,10 @@ func execute(name string, c Collector, ch chan<- prometheus.Metric) {
 // Collector 所有指标采集类实现Collector接口用于更新指标
 type Collector interface {
 	// Get new metrics and expose them via prometheus registry.
-	Update(ch chan<- prometheus.Metric) error
+	Update(ch chan<- prometheus.Metric, params url.Values) error
 }
 
+// gathererMetrics 表示是否聚合采集器的输出到/metrics，当metricsURL为false是采集器的输出通过metricsURL地址获取
 func registerCollector(collector string, factory func() (Collector, error)) {
 	factories[collector] = factory
 }
@@ -95,7 +99,7 @@ func disabled(collector string) bool {
 }
 
 // 创建SDPCollector
-func NewNodeCollector() (*SDPCollector, error) {
+func NewCollector(r *http.Request) (*SDPCollector, error) {
 
 	for _, s := range config.GlobalExporterConfig.Collector.Exclude {
 		excluding.Add(s)
@@ -121,5 +125,8 @@ func NewNodeCollector() (*SDPCollector, error) {
 		}
 
 	}
-	return &SDPCollector{Collectors: collectors}, nil
+	return &SDPCollector{
+		Collectors: collectors,
+		Params:     r.URL.Query(),
+	}, nil
 }

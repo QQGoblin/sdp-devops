@@ -4,6 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"github.com/toolkits/nux"
+	"net/url"
 	"os"
 	"sdp-devops/pkg/exporter/config"
 	"strings"
@@ -48,7 +49,7 @@ func NewDiskCollector() (Collector, error) {
 }
 
 // 实现采集接口
-func (c *diskCollector) Update(ch chan<- prometheus.Metric) error {
+func (c *diskCollector) Update(ch chan<- prometheus.Metric, params url.Values) error {
 
 	nodename, _ := os.Hostname()
 	if len(config.GetDiskUseCheck().Monitor) == 0 {

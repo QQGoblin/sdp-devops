@@ -6,14 +6,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"net/url"
 	"os"
 	"sdp-devops/pkg/exporter/config"
+	"strings"
 	"sync"
 	"time"
 )
 
 type probeCollector struct {
-	code *prometheus.Desc // 返回的状态码
+	httpStatusCode *prometheus.Desc // 返回的状态码
 }
 
 const (
@@ -27,13 +29,57 @@ func init() {
 // 创建磁盘采集器
 func NewProbeCollector() (Collector, error) {
 	return &probeCollector{
-		code: prometheus.NewDesc(
+		httpStatusCode: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, probeCollectorSubsystem, "probe_http_status_code"),
 			"拨测状态码",
 			[]string{"node", "target", "type"},
 			nil,
 		),
 	}, nil
+}
+
+// 实现采集接口
+func (c *probeCollector) Update(ch chan<- prometheus.Metric, params url.Values) error {
+
+	probeRole := params.Get("probe/role")
+	nodename, _ := os.Hostname()
+	httpClient := InitHttpClient()
+	wg := sync.WaitGroup{}
+	wg.Add(len(config.GetProbeHttpStatusCode().Service))
+	for _, t := range config.GetProbeHttpStatusCode().Service {
+		doProbe := false
+		for _, l := range t.NodeSelector {
+			if strings.EqualFold(l, probeRole) {
+				doProbe = true
+				break
+			}
+		}
+		if len(t.NodeSelector) == 0 {
+			doProbe = true
+		}
+		if doProbe {
+			go func(service config.Service) {
+				c.ProbeHTTP(httpClient, nodename, service, ch)
+				wg.Done()
+			}(t)
+		} else {
+			wg.Done()
+		}
+
+	}
+	wg.Wait()
+	return nil
+}
+
+func (c *probeCollector) ProbeHTTP(httpClient *http.Client, nodename string, service config.Service, ch chan<- prometheus.Metric) {
+
+	req, _ := http.NewRequest("GET", service.TargetURL, nil)
+	resp, _ := httpClient.Do(req)
+	if resp != nil {
+		ch <- prometheus.MustNewConstMetric(c.httpStatusCode, prometheus.GaugeValue, float64(resp.StatusCode), nodename, service.TargetURL, service.Name)
+	} else {
+		ch <- prometheus.MustNewConstMetric(c.httpStatusCode, prometheus.GaugeValue, float64(0), nodename, service.TargetURL, service.Name)
+	}
 }
 
 // 创建 HTTP Client
@@ -60,33 +106,4 @@ func InitHttpClient() *http.Client {
 		Transport: tr,
 	}
 	return httpClient
-}
-
-// 实现采集接口
-func (c *probeCollector) Update(ch chan<- prometheus.Metric) error {
-
-	nodename, _ := os.Hostname()
-
-	httpClient := InitHttpClient()
-	wg := sync.WaitGroup{}
-	wg.Add(len(config.GetProbeHttpStatusCode().Service))
-	for _, t := range config.GetProbeHttpStatusCode().Service {
-		go func(service config.Service) {
-			c.ProbeHTTP(httpClient, nodename, service, ch)
-			wg.Done()
-		}(t)
-	}
-	wg.Wait()
-	return nil
-}
-
-func (c *probeCollector) ProbeHTTP(httpClient *http.Client, nodename string, service config.Service, ch chan<- prometheus.Metric) {
-
-	req, _ := http.NewRequest("GET", service.TargetURL, nil)
-	resp, _ := httpClient.Do(req)
-	if resp != nil {
-		ch <- prometheus.MustNewConstMetric(c.code, prometheus.GaugeValue, float64(resp.StatusCode), nodename, service.TargetURL, service.Name)
-	} else {
-		ch <- prometheus.MustNewConstMetric(c.code, prometheus.GaugeValue, float64(0), nodename, service.TargetURL, service.Name)
-	}
 }

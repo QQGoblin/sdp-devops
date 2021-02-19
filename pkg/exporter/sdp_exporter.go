@@ -12,20 +12,25 @@ import (
 // 启动 exporter server
 func Main() {
 	config.LoadConfig()
-
-	sc, _ := collector.NewNodeCollector()
-	r := prometheus.NewRegistry()
-	if err := r.Register(sc); err != nil {
+	http.HandleFunc(config.GlobalExporterConfig.MetricsPath, handlerFunc)
+	if err := http.ListenAndServe("0.0.0.0:"+config.GlobalExporterConfig.Port, nil); err != nil {
 		logrus.Errorf("创建SDPCollector实例失败: %s", err)
 	}
-	handler := promhttp.HandlerFor(
-		prometheus.Gatherers{r},
+}
+
+func handlerFunc(w http.ResponseWriter, r *http.Request) {
+
+	sc, _ := collector.NewCollector(r)
+	registry := prometheus.NewRegistry()
+	if err := registry.Register(sc); err != nil {
+		logrus.Errorf("创建SDPCollector实例失败: %s", err)
+	}
+
+	h := promhttp.HandlerFor(
+		prometheus.Gatherers{registry},
 		promhttp.HandlerOpts{
 			ErrorHandling: promhttp.ContinueOnError,
 		},
 	)
-	http.Handle(config.GlobalExporterConfig.MetricsPath, handler)
-	if err := http.ListenAndServe("0.0.0.0:"+config.GlobalExporterConfig.Port, nil); err != nil {
-		logrus.Errorf("创建SDPCollector实例失败: %s", err)
-	}
+	h.ServeHTTP(w, r)
 }

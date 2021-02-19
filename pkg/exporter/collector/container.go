@@ -5,6 +5,7 @@ package collector
 //	"github.com/prometheus/client_golang/prometheus"
 //	"github.com/sirupsen/logrus"
 //	v1 "k8s.io/api/core/v1"
+//	"net/url"
 //	"os"
 //	"path"
 //	"sdp-devops/pkg/exporter/config"
@@ -54,7 +55,7 @@ package collector
 //
 //// 实现采集接口
 //// TODO: 去除docker相关依赖
-//func (c *containerCollector) Update(ch chan<- prometheus.Metric) error {
+//func (c *containerCollector) Update(ch chan<- prometheus.Metric, params url.Values) error {
 //	k8scli, _ := k8stools.KubeClientAndConfig(config.KubeConfigStr)
 //	dockercli := dockertools.DockerClient("")
 //	podDict, err := k8stools.GetPodDict(k8scli, "")
