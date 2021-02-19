@@ -89,5 +89,4 @@ func (c *probeCollector) ProbeHTTP(httpClient *http.Client, nodename string, ser
 	} else {
 		ch <- prometheus.MustNewConstMetric(c.code, prometheus.GaugeValue, float64(0), nodename, service.TargetURL, service.Name)
 	}
-	defer resp.Body.Close()
 }
