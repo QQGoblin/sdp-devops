@@ -48,15 +48,22 @@ func (c *probeCollector) Update(ch chan<- prometheus.Metric, params url.Values) 
 	wg.Add(len(config.GetProbeHttpStatusCode().Service))
 	for _, t := range config.GetProbeHttpStatusCode().Service {
 		doProbe := false
+
+		if strings.EqualFold(probeRole, "") || len(t.NodeSelector) == 0 {
+			// 没有传Role，并且没有指定拨测节点
+			doProbe = true
+		} else if strings.EqualFold(probeRole, "") || len(t.NodeSelector) != 0 {
+			// 没有传Role，但是指定拨测节点
+			doProbe = false
+		}
+		// 指定拨测节点
 		for _, l := range t.NodeSelector {
 			if strings.EqualFold(l, probeRole) {
 				doProbe = true
 				break
 			}
 		}
-		if strings.EqualFold(probeRole, "") || len(t.NodeSelector) == 0 {
-			doProbe = true
-		}
+
 		if doProbe {
 			go func(service config.Service) {
 				c.ProbeHTTP(httpClient, nodename, service, ch)
