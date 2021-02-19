@@ -11,6 +11,8 @@ import (
 
 // 启动 exporter server
 func Main() {
+	config.LoadConfig()
+
 	sc, _ := collector.NewNodeCollector()
 	r := prometheus.NewRegistry()
 	if err := r.Register(sc); err != nil {
@@ -22,8 +24,8 @@ func Main() {
 			ErrorHandling: promhttp.ContinueOnError,
 		},
 	)
-	http.Handle(config.MetricsURL, handler)
-	if err := http.ListenAndServe("0.0.0.0:"+config.Port, nil); err != nil {
+	http.Handle(config.GlobalExporterConfig.MetricsPath, handler)
+	if err := http.ListenAndServe("0.0.0.0:"+config.GlobalExporterConfig.Port, nil); err != nil {
 		logrus.Errorf("创建SDPCollector实例失败: %s", err)
 	}
 }

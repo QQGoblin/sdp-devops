@@ -6,7 +6,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"sdp-devops/pkg/exporter/config"
-	"strings"
 	"sync"
 	"time"
 )
@@ -87,7 +86,7 @@ func registerCollector(collector string, factory func() (Collector, error)) {
 func disabled(collector string) bool {
 	isDisabled := excluding.Contains(collector)
 
-	if !isDisabled && strings.EqualFold(config.IncludingCol, "") {
+	if !isDisabled && len(config.GlobalExporterConfig.Collector.Include) == 0 {
 		// 没进黑名单，且没有配置白名单
 		return false
 	}
@@ -98,10 +97,10 @@ func disabled(collector string) bool {
 // 创建SDPCollector
 func NewNodeCollector() (*SDPCollector, error) {
 
-	for _, s := range strings.Split(config.ExcludingCol, ",") {
+	for _, s := range config.GlobalExporterConfig.Collector.Exclude {
 		excluding.Add(s)
 	}
-	for _, s := range strings.Split(config.IncludingCol, ",") {
+	for _, s := range config.GlobalExporterConfig.Collector.Include {
 		including.Add(s)
 	}
 	logrus.Infof("采集器白名单：%s", including.String())

@@ -51,13 +51,12 @@ func NewDiskCollector() (Collector, error) {
 func (c *diskCollector) Update(ch chan<- prometheus.Metric) error {
 
 	nodename, _ := os.Hostname()
-	monitorStr := config.MonitorDirectories
-	if strings.EqualFold(monitorStr, "") {
+	if len(config.GetDiskUseCheck().Monitor) == 0 {
 		logrus.Errorf("请指定磁盘监控目录")
 		return nil
 	}
-	directories := strings.Split(monitorStr, ",")
-	for _, directory := range directories {
+
+	for _, directory := range config.GetDiskUseCheck().Monitor {
 		dir := strings.ReplaceAll(directory[1:], "/", "-")
 		isMount := -1
 		_, isNotExist := os.Stat(directory)

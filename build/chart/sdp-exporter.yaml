@@ -35,42 +35,41 @@ spec:
             - mountPath: /host/proc
               name: proc
               readOnly: true
-        - name: sdp-exporter-slow
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
-          command: ["/bin/sdp-exporter"]
-          args:  [ "--including","container","--port","17001" ]
-          imagePullPolicy: Always
-          env:
-            - name: NUX_ROOTFS
-              value: /host
-          securityContext:
-            privileged: true
-            runAsUser: 0
-          volumeMounts:
-            - name: data
-              mountPath: /data
-              readOnly: true
-            - name: docker-sock
-              mountPath: /var/run/docker.sock
-              readOnly: true
-            - mountPath: /host/proc
-              name: proc
-              readOnly: true
-      hostNetwork: true
-      serviceAccount: sdp-devops
-      terminationGracePeriodSeconds: 0
-      tolerations:
-        - key: "node-role.kubernetes.io/master"
-          operator: "Exists"
-          effect: "NoSchedule"
-      volumes:
-        - name: data
-          hostPath:
-            path: /data
-        - name: docker-sock
-          hostPath:
-            path: /var/run/docker.sock
-            type: File
-        - name: proc
-          hostPath:
-            path: /proc
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sdp-exporter
+  namespace: sdp-devops
+  labels:
+    name: sdp-exporter
+data:
+  exporter.conf: |
+    port: 17000
+    metricsPath: "/metrics"
+    collector:
+      exclude:
+        - "container"
+      config:
+        diskUseCheck:
+          monitor:
+            - "/data"
+        probeHttpStatusCode:
+          timeOutSec: 10
+          tlsConfig:
+            x509KeyPair:
+              - certFile: healthcheck-client.crt
+                keyFile: healthcheck-client.key
+                name: etcd-healthcheck-client
+              - certFile: kube-admin.crt
+                keyFile: kube-admin.key
+                name: kube-admin
+            insecureSkipVerify: true
+          service:
+            - targetURL: https://127.0.0.1:6443/healthz
+              name: kube-apiserver
+              nodeSelector:
+                - kube-master
+            - target: http://127.0.0.1:1988/health
+              name: falcon-agent
