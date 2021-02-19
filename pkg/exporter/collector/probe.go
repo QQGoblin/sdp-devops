@@ -41,7 +41,7 @@ func NewProbeCollector() (Collector, error) {
 // 实现采集接口
 func (c *probeCollector) Update(ch chan<- prometheus.Metric, params url.Values) error {
 
-	probeRole := params.Get("probe/role")
+	probeRole := params.Get("role")
 	nodename, _ := os.Hostname()
 	httpClient := InitHttpClient()
 	wg := sync.WaitGroup{}
@@ -54,7 +54,7 @@ func (c *probeCollector) Update(ch chan<- prometheus.Metric, params url.Values) 
 				break
 			}
 		}
-		if len(t.NodeSelector) == 0 {
+		if strings.EqualFold(probeRole, "") || len(t.NodeSelector) == 0 {
 			doProbe = true
 		}
 		if doProbe {

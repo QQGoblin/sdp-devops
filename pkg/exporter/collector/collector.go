@@ -4,7 +4,6 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
-	"net/http"
 	"net/url"
 	"os"
 	"sdp-devops/pkg/exporter/config"
@@ -99,7 +98,7 @@ func disabled(collector string) bool {
 }
 
 // 创建SDPCollector
-func NewCollector(r *http.Request) (*SDPCollector, error) {
+func NewCollector() (*SDPCollector, error) {
 
 	for _, s := range config.GlobalExporterConfig.Collector.Exclude {
 		excluding.Add(s)
@@ -127,6 +126,6 @@ func NewCollector(r *http.Request) (*SDPCollector, error) {
 	}
 	return &SDPCollector{
 		Collectors: collectors,
-		Params:     r.URL.Query(),
+		Params:     nil,
 	}, nil
 }
