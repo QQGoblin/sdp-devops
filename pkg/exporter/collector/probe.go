@@ -56,7 +56,7 @@ func InitHttpClient() *http.Client {
 		},
 	}
 	httpClient := &http.Client{
-		Timeout:   10 * time.Second,
+		Timeout:   time.Duration(config.GetProbeHttpStatusCode().TimeOutSec) * time.Second,
 		Transport: tr,
 	}
 	return httpClient
