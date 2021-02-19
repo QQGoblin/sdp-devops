@@ -49,18 +49,19 @@ func (c *probeCollector) Update(ch chan<- prometheus.Metric, params url.Values) 
 	for _, t := range config.GetProbeHttpStatusCode().Service {
 		doProbe := false
 
-		if strings.EqualFold(probeRole, "") || len(t.NodeSelector) == 0 {
-			// 没有传Role，并且没有指定拨测节点
+		if len(t.NodeSelector) == 0 {
+			// 没有指定拨测节点，传不传role都拨测
 			doProbe = true
-		} else if strings.EqualFold(probeRole, "") || len(t.NodeSelector) != 0 {
+		} else if strings.EqualFold(probeRole, "") && len(t.NodeSelector) != 0 {
 			// 没有传Role，但是指定拨测节点
 			doProbe = false
-		}
-		// 指定拨测节点
-		for _, l := range t.NodeSelector {
-			if strings.EqualFold(l, probeRole) {
-				doProbe = true
-				break
+		} else {
+			// 指定拨测节点
+			for _, l := range t.NodeSelector {
+				if strings.EqualFold(l, probeRole) {
+					doProbe = true
+					break
+				}
 			}
 		}
 
