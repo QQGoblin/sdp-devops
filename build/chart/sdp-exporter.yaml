@@ -13,11 +13,11 @@ spec:
       labels:
         name: sdp-exporter
     spec:
+      hostNetwork: true
       containers:
         - name: sdp-exporter
-          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.3
+          image: wxext-registry.101.com/sdp/sdp-devops:v0.4.4-beta
           command: ["/bin/sdp-exporter"]
-          args:  [ "--excluding","container"]
           imagePullPolicy: Always
           env:
             - name: NUX_ROOTFS
@@ -26,16 +26,43 @@ spec:
             privileged: true
             runAsUser: 0
           volumeMounts:
+            - name: config
+              mountPath: /etc/sdp
             - name: data
               mountPath: /data
-              readOnly: true
-            - name: docker-sock
-              mountPath: /var/run/docker.sock
               readOnly: true
             - mountPath: /host/proc
               name: proc
               readOnly: true
-
+            - mountPath: /etc/cert/etcd-healthcheck-client
+              name: etcd-healthcheck-client
+              readOnly: true
+            - mountPath: /etc/cert/k8s-admin-client
+              name: k8s-admin-client
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: sdp-exporter
+            items:
+              - key: exporter.conf
+                path: exporter.conf
+        - name: data
+          hostPath:
+            path: /data
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: etcd-healthcheck-client
+          secret:
+            secretName: etcd-healthcheck-client
+        - name: k8s-admin-client
+          secret:
+            secretName: k8s-admin-client
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -59,17 +86,33 @@ data:
           timeOutSec: 10
           tlsConfig:
             x509KeyPair:
-              - certFile: healthcheck-client.crt
-                keyFile: healthcheck-client.key
+              - certFile: /etc/cert/etcd-healthcheck-client/tls.crt
+                keyFile: /etc/cert/etcd-healthcheck-client/tls.key
                 name: etcd-healthcheck-client
-              - certFile: kube-admin.crt
-                keyFile: kube-admin.key
+              - certFile: /etc/cert/k8s-admin-client/tls.crt
+                keyFile: /etc/cert/k8s-admin-client/tls.key
                 name: kube-admin
             insecureSkipVerify: true
           service:
-            - targetURL: https://127.0.0.1:6443/healthz
+            - targetURL: "https://127.0.0.1:2379/healthy"
+              name: etcd
+              nodeSelector:
+                - master
+            - targetURL: "https://127.0.0.1:6443/healthz"
               name: kube-apiserver
               nodeSelector:
-                - kube-master
-            - target: http://127.0.0.1:1988/health
+                - master
+            - targetURL: "https://127.0.0.1:10257/healthz"
+              name: kube-controller-manager
+              nodeSelector:
+                - master
+            - targetURL: "https://127.0.0.1:10259/healthz"
+              name: kube-scheduler
+              nodeSelector:
+                - master
+            - targetURL: "http://127.0.0.1:10249/healthz"
+              name: kube-proxy
+            - targetURL: "https://127.0.0.1:10250/healthz"
+              name: kubelet
+            - targetURL: "http://127.0.0.1:1988/health"
               name: falcon-agent

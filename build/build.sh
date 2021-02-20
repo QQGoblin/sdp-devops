@@ -12,3 +12,9 @@ cd -
 
 docker build -t ${IMAGE}:${VERSION} ./
 docker push ${IMAGE}:${VERSION}
+
+
+# 创建相应证书
+
+kubectl  create secret tls etcd-healthcheck-client --cert=/etc/etcd/healthcheck-client.crt --key=/etc/etcd/healthcheck-client.key --namespace sdp-devops
+kubectl  create secret tls k8s-admin-client --cert=/etc/kubernetes/admin.crt --key=/etc/kubernetes/admin.key --namespace sdp-devops
