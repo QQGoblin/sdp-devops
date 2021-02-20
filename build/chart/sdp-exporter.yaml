@@ -94,7 +94,7 @@ data:
                 name: kube-admin
             insecureSkipVerify: true
           service:
-            - targetURL: "https://127.0.0.1:2379/healthy"
+            - targetURL: "https://127.0.0.1:2379/health"
               name: etcd
               nodeSelector:
                 - master
