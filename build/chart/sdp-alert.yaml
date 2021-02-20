@@ -57,8 +57,12 @@ data:
   alert.conf: |
     port: 8080
     alertNameMap:
-      HighErrorRate: "磁盘空间不足"
+      HighDiskRate: "磁盘空间不足"
       HttpProbeError: "服务拨测异常"
+      HighCPURate: "CPU使用率高"
+      HighCPULoad: "5min负载高"
+      HighMemRate: "内存使用率高"
+      HighIORate: "磁盘IO占比高"
     areaNameMap:
       CL: "长乐环境"
       AWSCA: "AWS 加利福尼亚环境"
